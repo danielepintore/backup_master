@@ -12,6 +12,7 @@ struct BackupMasterApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .tint(.red)
         }
     }
 }

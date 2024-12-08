@@ -9,73 +9,67 @@ import SwiftUI
 import Photos
 
 struct ContentView: View {
-    let services: [BackupServices] = [.init(name: "WebDav", imageName: "server.rack", color: .blue), .init(name: "FTP", imageName: "server.rack", color: .green), .init(name: "BackBlaze B2", imageName: "server.rack", color: .red)]
-    
-    @StateObject var assetController = AssetController()
-    
-    let colors: [Color] = [Color.green, Color.red, Color.blue, Color.yellow, Color.orange]
+    @State private var viewModel = ViewModel()
     
     var body: some View {
-        let libraryAccessProvided = assetController.checkPermissions()
+        let appHasAccessToPhotoLibrary = viewModel.appHasAccessToPhotoLibrary()
         NavigationStack {
             List {
                 Section("Photo albums") {
-                    if (libraryAccessProvided) {
-                        ForEach(assetController.albumNames, id: \.self) { albumName in
-                            NavigationLink(value: albumName){
-                                Label(albumName, systemImage: "photo.on.rectangle.angled")
+                    if (appHasAccessToPhotoLibrary) {
+                        ForEach(viewModel.albums, id: \.name) { album in
+                            NavigationLink(destination: AlbumView(album: album)) {
+                                Label(album.name, systemImage: "photo.on.rectangle.angled")
                             }
                         }
                     } else {
                         Text("Please provide access to your photos library.")
                         Button("Ask permissions") {
                             Task {
-                                await assetController.askPermissions()
+                                await viewModel.askForPhotoAccess()
                             }
                         }
                     }
                 }
                 Section("Services") {
-                    ForEach(services, id: \.name){ service in
+                    ForEach(viewModel.backupServices, id: \.name){ service in
                         NavigationLink(value: service){
-                            Label(service.name, systemImage: service.imageName)
+                            HStack {
+                                Label(service.name, systemImage: service.imageName)
+                            }
                         }
                     }
+                    .onMove(perform: moveService)
+                    .onDelete(perform: deleteService)
                 }
                 Section("Other") {
-                    Label("Settings", systemImage: "gear")
+                    NavigationLink(destination: SettingsView()) {
+                        Label("Settings", systemImage: "gear")
+                    }
                 }
             }
             .navigationTitle("Backup Master")
             .navigationDestination(for: BackupServices.self) { service in
                 Text(service.name)
             }
-            .navigationDestination(for: String.self) { selectedAlbum in
-                AlbumLoaderView(albumName: selectedAlbum, assetController: assetController)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    EditButton()
+                }
             }
         }
     }
-}
+    private func deleteService(at offsets: IndexSet) {
+        offsets.forEach { index in
+            let service = viewModel.backupServices[index]
+            print("Removing \(service.name)")
+        }
+    }
 
-struct AlbumLoaderView: View {
-    let albumName: String
-    @ObservedObject var assetController: AssetController
-    @State private var photos: [PHAsset] = []
-    var body: some View {
-        AlbumView(albumName: albumName, photos: photos)
-            .onAppear {
-                assetController.loadPhotos(fromAlbum: albumName) { assets in
-                    self.photos = assets
-                }
-            }
+    private func moveService(from source: IndexSet, to destination: Int) {
     }
 }
 
-struct BackupServices: Hashable {
-    let name: String
-    let imageName: String
-    let color: Color
-}
 #Preview {
     ContentView()
 }
