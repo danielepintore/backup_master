@@ -11,10 +11,7 @@ import Photos
 struct AlbumView: View {
     let album: Album
     let columns: [GridItem] = [
-        .init(.flexible()),
-        .init(.flexible()),
-        .init(.flexible()),
-        .init(.flexible()),
+        .init(.adaptive(minimum: 80, maximum: 100)),
     ]
     @State private var isSheetPresented: Bool = false
     
