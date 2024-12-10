@@ -12,11 +12,10 @@ struct ContentView: View {
     @State private var viewModel = ViewModel()
     
     var body: some View {
-        let appHasAccessToPhotoLibrary = viewModel.appHasAccessToPhotoLibrary()
         NavigationStack {
             List {
                 Section("Photo albums") {
-                    if (appHasAccessToPhotoLibrary) {
+                    if (viewModel.photoAccessGranted) {
                         ForEach(viewModel.albums, id: \.name) { album in
                             NavigationLink(destination: AlbumView(album: album)) {
                                 Label(album.name, systemImage: "photo.on.rectangle.angled")
@@ -25,9 +24,7 @@ struct ContentView: View {
                     } else {
                         Text("Please provide access to your photos library.")
                         Button("Ask permissions") {
-                            Task {
-                                await viewModel.askForPhotoAccess()
-                            }
+                            viewModel.openSettingsForPermissions()
                         }
                     }
                 }
@@ -55,6 +52,11 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     EditButton()
+                }
+            }
+            .onAppear {
+                Task {
+                    await viewModel.requestPhotoLibraryAccess()
                 }
             }
         }

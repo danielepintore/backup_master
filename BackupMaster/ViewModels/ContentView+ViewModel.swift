@@ -7,6 +7,7 @@
 
 import Foundation
 import Photos
+import UIKit
 
 private let services: [BackupServices] = [
     BackupServices(name: "WebDAV", imageName: "server.rack"),
@@ -23,10 +24,17 @@ extension ContentView {
         private(set) var backupServices: [BackupServices] = []
         private(set) var albums: [Album] = []
         private let fetchHiddenAlbum: Bool = true
+        private(set) var photoAccessGranted: Bool = false
+        private var photoLibraryAuthorization: PHAuthorizationStatus {
+            get {
+                return PHPhotoLibrary.authorizationStatus(for: .readWrite)
+            }
+        }
         
         override init() {
             super.init()
             PHPhotoLibrary.shared().register(self)
+            photoAccessGranted = photoLibraryAuthorization == .authorized || photoLibraryAuthorization == .limited
             backupServices = services
             loadAlbums()
         }
@@ -39,6 +47,28 @@ extension ContentView {
             self.loadAlbums()
         }
         
+        func requestPhotoLibraryAccess() async {
+            if (photoLibraryAuthorization == .authorized ||
+                photoLibraryAuthorization == .limited) {
+                photoAccessGranted = true;
+                return
+            }
+            if (photoLibraryAuthorization == .notDetermined) {
+                PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
+                    if status == .authorized || status == .limited {
+                        self.photoAccessGranted = true
+                    }
+                }
+            }
+        }
+        
+        func openSettingsForPermissions() {
+            if let appSettings = URL(string: UIApplication.openSettingsURLString) {
+                if UIApplication.shared.canOpenURL(appSettings) {
+                    UIApplication.shared.open(appSettings, options: [:], completionHandler: nil)
+                }
+            }
+        }
         private func loadAlbums() {
             var fetchedAlbums: [Album] = []
             // Fetch Recents smart album
@@ -85,10 +115,6 @@ extension ContentView {
             @unknown default:
                 return false
             }
-        }
-        
-        public func askForPhotoAccess() async {
-            await PHPhotoLibrary.requestAuthorization(for: .readWrite)
         }
     }
 }
