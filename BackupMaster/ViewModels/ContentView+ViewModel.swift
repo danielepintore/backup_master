@@ -84,15 +84,19 @@ extension ContentView {
             }
             
             // Fetch Hidden smart album
-            let hiddenAlbum = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .smartAlbumAllHidden, options: nil)
+            // Hidden photos will be displayed only if the user disable the Require Authentication toggle to see the hidden photos
+            // Or I should implement the photo picker for manually selecting the photos
+            let hiddenFetchOptions = PHFetchOptions()
+            hiddenFetchOptions.includeHiddenAssets = true
+            let hiddenAlbum = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .smartAlbumAllHidden, options: hiddenFetchOptions)
             hiddenAlbum.enumerateObjects { (collection, index, stop) in
                 fetchedAlbums.append(Album(name: collection.localizedTitle, collection: collection))
             }
             
             // Fetch User created albums
-            let fetchOptions = PHFetchOptions()
-            fetchOptions.sortDescriptors = [NSSortDescriptor(key: "localizedTitle", ascending: true)]
-            let userAlbums = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: fetchOptions)
+            let userFetchOptions = PHFetchOptions()
+            userFetchOptions.sortDescriptors = [NSSortDescriptor(key: "localizedTitle", ascending: true)]
+            let userAlbums = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: userFetchOptions)
             userAlbums.enumerateObjects { (collection, index, stop) in
                 fetchedAlbums.append(Album(name: collection.localizedTitle, collection: collection))
             }
