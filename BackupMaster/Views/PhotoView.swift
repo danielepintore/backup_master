@@ -10,7 +10,13 @@ import Photos
 
 struct PhotoView: View {
     let asset: PHAsset
+    let imageSize: CGSize
     @State private var image: UIImage? = nil
+    
+    init(asset: PHAsset, imageSize: CGSize? = nil) {
+        self.asset = asset
+        self.imageSize = imageSize ?? CGSize(width: asset.pixelWidth, height: asset.pixelHeight)
+    }
     
     var body: some View {
         Group {
@@ -28,10 +34,9 @@ struct PhotoView: View {
     }
     
     private func loadImage() {
-        let scaleFactor = 18;
         let options = PHImageRequestOptions()
         options.isSynchronous = true
-        PHImageManager.default().requestImage(for: asset, targetSize: CGSize(width: asset.pixelWidth/scaleFactor, height: asset.pixelHeight/scaleFactor), contentMode: .aspectFill, options: options) { (image, info) in
+        PHImageManager.default().requestImage(for: asset, targetSize: imageSize, contentMode: .aspectFill, options: options) { (image, info) in
             self.image = image
         }
     }
