@@ -10,26 +10,40 @@ import Photos
 
 struct AlbumView: View {
     let album: Album
-    let columns: [GridItem] = [
-        .init(.adaptive(minimum: 80, maximum: 100)),
-    ]
+    let columnsCount: Int
+    let spacingPercentage: Int
     @State private var isSheetPresented: Bool = false
     
+    init(album: Album, columns: Int = 4, spacingPercentage: Int = 2) {
+        self.album = album
+        self.columnsCount = columns
+        self.spacingPercentage = spacingPercentage
+    }
+    
     var body: some View {
-        ScrollView {
-            Text("\(album.assets.count) Elements")
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .bold()
-                .padding()
-            LazyVGrid(columns: columns, spacing: 5){
-                ForEach(album.assets, id: \.self) { photo in
-                    PhotoView(asset: photo)
-                        .scaledToFill()
-                        .frame(width: 100, height: 100)
-                        .clipped()
+        GeometryReader { geometry in
+            ScrollView {
+                Text("\(album.assets.count) Elements")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .bold()
+                    .padding()
+                let spacingFactor = Double(spacingPercentage) / 100
+                // Calculates the image width and height (aspect ratio 1:1)
+                let imageWidthHeight = (geometry.size.width - (geometry.size.width * spacingFactor)) / CGFloat(columnsCount)
+                let imageSize = CGSize(width: imageWidthHeight, height: imageWidthHeight)
+                let spacing = geometry.size.width * spacingFactor / CGFloat(columnsCount)
+                let columns: [GridItem] = Array(repeating: .init(.flexible(minimum: 50), spacing: 0), count: columnsCount)
+                LazyVGrid(columns: columns, spacing: spacing){
+                    ForEach(album.assets, id: \.self) { photo in
+                        PhotoView(asset: photo, imageSize: imageSize)
+                            .scaledToFill()
+                            .frame(width: imageSize.width, height: imageSize.height)
+                            .clipped()
+                        //.border(Color.red, width: 2) // Adding a black border
+                    }
+                    .animation(.bouncy, value: album.assets)
+                    //.border(Color.primary, width: 2) // Adding a black border}
                 }
-                .animation(.bouncy, value: album.assets)
-                //.border(Color.primary, width: 2) // Adding a black border}
             }
             .navigationTitle(album.name)
             .toolbar {
