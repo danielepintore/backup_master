@@ -14,7 +14,7 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Photo albums") {
+                BMSection("Albums") {
                     if (viewModel.photoAccessGranted) {
                         ForEach(viewModel.albums, id: \.name) { album in
                             NavigationLink(destination: AlbumView(album: album)) {
@@ -28,7 +28,7 @@ struct ContentView: View {
                         }
                     }
                 }
-                Section("Services") {
+                BMSection("Services") {
                     ForEach(viewModel.backupServices, id: \.name){ service in
                         NavigationLink(value: service){
                             HStack {
@@ -39,7 +39,7 @@ struct ContentView: View {
                     .onMove(perform: moveService)
                     .onDelete(perform: deleteService)
                 }
-                Section("Other") {
+                BMSection("Other") {
                     NavigationLink(destination: SettingsView()) {
                         Label("Settings", systemImage: "gear")
                     }
