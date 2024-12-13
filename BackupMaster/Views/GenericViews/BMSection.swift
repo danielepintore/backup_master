@@ -23,7 +23,6 @@ struct BMSection<Content: View>: View {
                 .foregroundStyle(.primary)
                 .textCase(.none)
         }
-
     }
 }
 

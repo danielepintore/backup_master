@@ -45,6 +45,7 @@ struct ContentView: View {
                     }
                 }
             }
+            .listSectionSpacing(.compact)
             .navigationTitle("Backup Master")
             .navigationDestination(for: BackupServices.self) { service in
                 Text(service.name)
