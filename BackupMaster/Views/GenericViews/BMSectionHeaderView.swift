@@ -15,8 +15,9 @@ struct BMSectionHeaderView: View {
     }
     var body: some View {
         Text(title)
-            .font(.title3)
+            .font(.title2)
             .bold()
+            .padding(.bottom, CGFloat(5))
     }
 }
 

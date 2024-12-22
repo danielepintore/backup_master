@@ -17,7 +17,7 @@ struct ContentView: View {
                 BMSection("Albums") {
                     if (viewModel.photoAccessGranted) {
                         ForEach(viewModel.albums, id: \.name) { album in
-                            NavigationLink(destination: AlbumView(album: album)) { // Allow user to select how many colums, need to save preference to userdefaults
+                            NavigationLink(destination: AlbumView(album: album, columns: 5)) { // Allow user to select how many colums, need to save preference to userdefaults
                                 Label(album.name, systemImage: "photo.on.rectangle.angled")
                             }
                         }
