@@ -35,7 +35,7 @@ struct AlbumView: View {
                 let columns: [GridItem] = Array(repeating: .init(.flexible(minimum: 50), spacing: 0), count: columnsCount)
                 LazyVGrid(columns: columns, spacing: spacing){
                     ForEach(album.assets, id: \.self) { photo in
-                        PhotoView(asset: photo, imageSize: imageSize)
+                        PhotoView(asset: photo, imageSize: imageSize, qualityFactor: 1.5)
                             .scaledToFill()
                             .frame(width: imageSize.width, height: imageSize.height)
                             .clipped()
