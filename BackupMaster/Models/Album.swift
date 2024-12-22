@@ -16,7 +16,7 @@ class Album: Identifiable, Equatable {
     private(set) var creationDate: Date?
     
     init(name: String?, collection: PHAssetCollection, assets: [PHAsset]) {
-        self.id = collection.localIdentifier
+        self.id = collection.localIdentifier + "-" + String(assets.count)
         self.name = name ?? "Unnamed Album"
         self.collection = collection
         self.assets = assets
@@ -31,6 +31,7 @@ class Album: Identifiable, Equatable {
         let fetchOptions = PHFetchOptions()
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         self.loadAssets(fetchOptions: fetchOptions)
+        self.id = collection.localIdentifier + "-" + String(assets.count)
         self.creationDate = collection.startDate
     }
     
