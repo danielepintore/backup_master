@@ -38,7 +38,7 @@ struct PhotoView: View {
     
     private func loadImage() {
         let options = PHImageRequestOptions()
-        options.isSynchronous = true
+        options.isSynchronous = false
         options.deliveryMode = .opportunistic
         options.version = .current
         // New target size to improve quality
