@@ -10,15 +10,26 @@ import Photos
 
 struct ContentView: View {
     @State private var viewModel = ViewModel()
-    
+    @State private var editMode: EditMode = .inactive;
     var body: some View {
         NavigationStack {
             List {
                 BMSection("Albums") {
                     if (viewModel.photoAccessGranted) {
-                        ForEach(viewModel.albums, id: \.name) { album in
-                            NavigationLink(destination: AlbumView(album: album, columns: 5)) { // Allow user to select how many colums, need to save preference to userdefaults
-                                Label(album.name, systemImage: "photo.on.rectangle.angled")
+                        ForEach($viewModel.albums, id: \.album.id) { $albumVM in
+                            if (albumVM.shouldShowAlbum || editMode.isEditing) {
+                                HStack {
+                                    if editMode.isEditing {
+                                        BMCheckmarkButton(isChecked: $albumVM.shouldShowAlbum)
+                                            .padding(.trailing)
+                                            .transition(.opacity)
+                                            .transition(.move(edge: .leading))
+                                    }
+                                    NavigationLink(value: albumVM.album) {
+                                        Label(albumVM.album.name, systemImage: "photo.on.rectangle.angled")
+                                    }
+                                }
+                                .animation(.default, value: editMode.isEditing)
                             }
                         }
                     } else {
@@ -47,14 +58,15 @@ struct ContentView: View {
             }
             .listSectionSpacing(.compact)
             .navigationTitle("Backup Master")
-            .navigationDestination(for: BackupServices.self) { service in
-                Text(service.name)
+            .navigationDestination(for: Album.self) { album in
+                AlbumView(album: album, columns: 5) // Allow user to select how many colums, need to save preference to userdefaults
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     EditButton()
                 }
             }
+            .environment(\.editMode, $editMode)
             .onAppear {
                 Task {
                     await viewModel.requestPhotoLibraryAccess()

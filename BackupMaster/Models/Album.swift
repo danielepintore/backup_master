@@ -8,7 +8,7 @@
 import Foundation
 import Photos
 
-class Album: Identifiable, Equatable {
+class Album: Identifiable, Equatable, Hashable {
     var id: String
     private(set) var name: String
     private(set) var collection: PHAssetCollection
@@ -36,7 +36,11 @@ class Album: Identifiable, Equatable {
     }
     
     static func == (lhs: Album, rhs: Album) -> Bool {
-        return lhs.id == rhs.id && lhs.collection.estimatedAssetCount == rhs.collection.estimatedAssetCount
+        return lhs.id == rhs.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
     
     private func loadAssets(fetchOptions: PHFetchOptions) {

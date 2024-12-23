@@ -19,10 +19,33 @@ private let services: [BackupServices] = [
 ]
 
 extension ContentView {
+    struct AlbumViewModel {
+        let album: Album
+        private var key: String {
+            get {
+                "album-\(album.id)-showStatus"
+            }
+        }
+        var shouldShowAlbum: Bool {
+            set {
+                UserDefaults.standard.set(newValue, forKey: key)
+            }
+            get {
+                let isKeySet = UserDefaults.standard.object(forKey: key) != nil
+                if !isKeySet {
+                    UserDefaults.standard.set(true, forKey: key)
+                }
+                return UserDefaults.standard.bool(forKey: key)
+            }
+        }
+    }
+}
+
+extension ContentView {
     @Observable
     class ViewModel: NSObject, PHPhotoLibraryChangeObserver {
         private(set) var backupServices: [BackupServices] = []
-        private(set) var albums: [Album] = []
+        var albums: [AlbumViewModel] = []
         private let fetchHiddenAlbum: Bool = true
         private(set) var photoAccessGranted: Bool = false
         private var photoLibraryAuthorization: PHAuthorizationStatus {
@@ -70,17 +93,17 @@ extension ContentView {
             }
         }
         private func loadAlbums() {
-            var fetchedAlbums: [Album] = []
+            var fetchedAlbums: [AlbumViewModel] = []
             // Fetch Recents smart album
             let recentsAlbum = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .smartAlbumUserLibrary, options: nil)
             recentsAlbum.enumerateObjects { (collection, index, stop) in
-                fetchedAlbums.append(Album(name: collection.localizedTitle, collection: collection))
+                fetchedAlbums.append(AlbumViewModel(album: Album(name: collection.localizedTitle, collection: collection)))
             }
             
             // Fetch Favorite smart album
             let favoriteAlbum = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .smartAlbumFavorites, options: nil)
             favoriteAlbum.enumerateObjects { (collection, index, stop) in
-                fetchedAlbums.append(Album(name: collection.localizedTitle, collection: collection))
+                fetchedAlbums.append(AlbumViewModel(album: Album(name: collection.localizedTitle, collection: collection)))
             }
             
             // Fetch Hidden smart album
@@ -90,7 +113,7 @@ extension ContentView {
             hiddenFetchOptions.includeHiddenAssets = true
             let hiddenAlbum = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .smartAlbumAllHidden, options: hiddenFetchOptions)
             hiddenAlbum.enumerateObjects { (collection, index, stop) in
-                fetchedAlbums.append(Album(name: collection.localizedTitle, collection: collection))
+                fetchedAlbums.append(AlbumViewModel(album: Album(name: collection.localizedTitle, collection: collection)))
             }
             
             // Fetch User created albums
@@ -98,7 +121,7 @@ extension ContentView {
             userFetchOptions.sortDescriptors = [NSSortDescriptor(key: "localizedTitle", ascending: true)]
             let userAlbums = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: userFetchOptions)
             userAlbums.enumerateObjects { (collection, index, stop) in
-                fetchedAlbums.append(Album(name: collection.localizedTitle, collection: collection))
+                fetchedAlbums.append(AlbumViewModel(album: Album(name: collection.localizedTitle, collection: collection)))
             }
             self.albums = fetchedAlbums
         }
