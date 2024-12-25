@@ -63,7 +63,19 @@ struct ContentView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    EditButton()
+                    Menu {
+                        Button("Add Service", systemImage: "plus") {
+                            // TODO: Open the add service page
+                        }
+                        let editButtonText = editMode == .active ? "Done" : "Edit"
+                        Button(editButtonText, systemImage: "pencil") {
+                            withAnimation {
+                                editMode = editMode == .active ? EditMode.inactive : EditMode.active
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
                 }
             }
             .environment(\.editMode, $editMode)
