@@ -9,13 +9,12 @@ import SwiftUI
 import Photos
 
 struct AlbumView: View {
-    let album: Album
     let columnsCount: Int
     let spacingPercentage: Int
-    @State private var isSheetPresented: Bool = false
+    @State private var viewModel: AlbumView.ViewModel
     
     init(album: Album, columns: Int = 4, spacingPercentage: Int = 2) {
-        self.album = album
+        self.viewModel = ViewModel(album: album)
         self.columnsCount = columns
         self.spacingPercentage = spacingPercentage
     }
@@ -23,7 +22,7 @@ struct AlbumView: View {
     var body: some View {
         GeometryReader { geometry in
             ScrollView {
-                Text("\(album.assets.count) Elements")
+                Text("\(viewModel.album.assets.count) Elements")
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .bold()
                     .padding()
@@ -34,75 +33,110 @@ struct AlbumView: View {
                 let spacing = geometry.size.width * spacingFactor / CGFloat(columnsCount)
                 let columns: [GridItem] = Array(repeating: .init(.flexible(minimum: 50), spacing: 0), count: columnsCount)
                 LazyVGrid(columns: columns, spacing: spacing){
-                    ForEach(album.assets, id: \.self) { photo in
-                        PhotoView(asset: photo, imageSize: imageSize, qualityFactor: 1.5)
-                            .scaledToFill()
-                            .frame(width: imageSize.width, height: imageSize.height)
-                            .clipped()
-                        //.border(Color.red, width: 2) // Adding a black border
+                    ForEach(viewModel.album.assets, id: \.self) { asset in
+                        ZStack(alignment: .bottomLeading) {
+                            PhotoView(asset: asset, imageSize: imageSize, qualityFactor: 1.5)
+                            if (viewModel.isSelectionActive && viewModel.selection.contains(asset)) {
+                                Rectangle()
+                                    .frame(width: imageSize.width, height: imageSize.height)
+                                    .foregroundStyle(Color.white.opacity(0.4))
+                                    .animation(.default, value: viewModel.selection)
+                                    .zIndex(1) // Animation fix
+                                Image(systemName: "checkmark.circle.fill")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 16, height: 16)
+                                    .padding(1)
+                                    .foregroundStyle(Color.accentColor)
+                                    .background(Color.white, in: Circle())
+                                    .padding(5)
+                                    .zIndex(1) // Animation fix
+                            }
+                        }
+                        .animation(.default, value: viewModel.selection)
+                        .animation(.default, value: viewModel.isSelectionActive)
+//                        .border(Color.red, width: 2) // Adding a black border
+                        .onTapGesture {
+                            viewModel.toggleAssetSelection(for: asset)
+                        }
                     }
-                    .animation(.bouncy, value: album.assets)
+                    .animation(.bouncy, value: viewModel.album.assets)
                     //.border(Color.primary, width: 2) // Adding a black border}
                 }
             }
-            .navigationTitle(album.name)
+            .navigationTitle(viewModel.album.name)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: {
-                        isSheetPresented.toggle()
+                        //                        isSheetPresented.toggle()
                     }) {
                         Image(systemName: "icloud.and.arrow.up")
                     }
                 }
             }
-            .sheet(isPresented: $isSheetPresented, content: {
-                UploadSheet()
-                    .presentationDetents([.fraction(0.4)])
-            })
-        }
-    }
-}
-
-struct UploadSheet: View {
-    var photoCount = 23
-    var services = ["WebDAV", "FTP", "SMB", "BackBlaze"]
-    @State private var selectedService: String = "WebDav"
-    var body: some View {
-        VStack {
-            Text("Upload Photos and Videos")
-                .font(.title2)
-                .bold()
-                .frame(width: .infinity, alignment: .leading)
-                .padding()
-            VStack(alignment: .leading) {
-                Text("Photos and video selected: \(photoCount)")
-                Text("Upload size: \(photoCount)GB")
-            }
-            .frame(alignment: .leading)
-            .padding()
-            Spacer()
-            HStack {
-                Text("Upload to: ")
-                Menu(selectedService) {
-                    ForEach(services, id: \.self) { service in
-                        Button(service, action: {
-                            selectedService = service
-                        })
-                    }
+            .overlay(alignment: .topTrailing, content: {
+                Button {
+                    viewModel.isSelectionActive.toggle()
+                } label: {
+                    Text(viewModel.isSelectionActive ? "Done": "Select")
+                        .font(.footnote)
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .foregroundStyle(Color.primary)
+                        .background(.regularMaterial, in: Capsule())
                 }
                 .padding()
-            }
-            Spacer()
-            Button("Start Upload") {
-                
-            }
-            .buttonStyle(BorderedButtonStyle.bordered)
-            .frame(width: .infinity)
+                .animation(.default, value: viewModel.isSelectionActive)
+            })
+            //            .sheet(isPresented: $isSheetPresented, content: {
+            //                UploadSheet()
+            //                    .presentationDetents([.fraction(0.4)])
+            //            })
         }
-        .frame(width: .infinity)
     }
 }
 
-#Preview {
-    UploadSheet() 
-}
+//struct UploadSheet: View {
+//    var photoCount = 23
+//    var services = ["WebDAV", "FTP", "SMB", "BackBlaze"]
+//    @State private var selectedService: String = "WebDav"
+//    var body: some View {
+//        VStack {
+//            Text("Upload Photos and Videos")
+//                .font(.title2)
+//                .bold()
+//                .frame(width: .infinity, alignment: .leading)
+//                .padding()
+//            VStack(alignment: .leading) {
+//                Text("Photos and video selected: \(photoCount)")
+//                Text("Upload size: \(photoCount)GB")
+//            }
+//            .frame(alignment: .leading)
+//            .padding()
+//            Spacer()
+//            HStack {
+//                Text("Upload to: ")
+//                Menu(selectedService) {
+//                    ForEach(services, id: \.self) { service in
+//                        Button(service, action: {
+//                            selectedService = service
+//                        })
+//                    }
+//                }
+//                .padding()
+//            }
+//            Spacer()
+//            Button("Start Upload") {
+//
+//            }
+//            .buttonStyle(BorderedButtonStyle.bordered)
+//            .frame(width: .infinity)
+//        }
+//        .frame(width: .infinity)
+//    }
+//}
+
+//#Preview {
+//    UploadSheet()
+//}

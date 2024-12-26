@@ -24,9 +24,24 @@ struct PhotoView: View {
     var body: some View {
         Group {
             if let image = image {
-                Image(uiImage: image)
-                    .resizable()
-                    //.border(Color.red, width: 2) // Adding a black border
+                ZStack (alignment: .bottomTrailing){
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: imageSize.width, height: imageSize.height)
+                    // mediaSubType for live photo
+                    // ex: asset.mediaSubType.contains(.photoLive)
+                    if asset.mediaType == .video {
+                        Image(systemName: "video.fill")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 14, height: 14)
+                            .padding(5)
+//                            .border(Color.red, width: 2) // Adding a black border
+                    }
+                }
+                .contentShape(Rectangle())
+                .clipped()
             } else {
                 Text("Loading...")
             }

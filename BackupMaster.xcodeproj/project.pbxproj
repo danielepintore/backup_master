@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6436A49C2D1CC3E9007C3B97 /* AlbumView+ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6436A49B2D1CC3E9007C3B97 /* AlbumView+ViewModel.swift */; };
 		648102EF2D062B3A00ADEC28 /* ServiceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648102EE2D062B3A00ADEC28 /* ServiceSettingsView.swift */; };
 		649A6E992D037B8700C18FC3 /* BackupMasterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649A6E982D037B8700C18FC3 /* BackupMasterApp.swift */; };
 		649A6E9B2D037B8700C18FC3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649A6E9A2D037B8700C18FC3 /* ContentView.swift */; };
@@ -21,6 +22,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6436A49B2D1CC3E9007C3B97 /* AlbumView+ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlbumView+ViewModel.swift"; sourceTree = "<group>"; };
 		648102EE2D062B3A00ADEC28 /* ServiceSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceSettingsView.swift; sourceTree = "<group>"; };
 		649A6E952D037B8700C18FC3 /* BackupMaster.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BackupMaster.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		649A6E982D037B8700C18FC3 /* BackupMasterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupMasterApp.swift; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 			isa = PBXGroup;
 			children = (
 				64D1807F2D05C54C00469C51 /* ContentView+ViewModel.swift */,
+				6436A49B2D1CC3E9007C3B97 /* AlbumView+ViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -193,6 +196,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				64D180822D05C67100469C51 /* BackupServices.swift in Sources */,
+				6436A49C2D1CC3E9007C3B97 /* AlbumView+ViewModel.swift in Sources */,
 				64D180862D061AAF00469C51 /* SettingsView.swift in Sources */,
 				649A6E9B2D037B8700C18FC3 /* ContentView.swift in Sources */,
 				649A6E992D037B8700C18FC3 /* BackupMasterApp.swift in Sources */,
