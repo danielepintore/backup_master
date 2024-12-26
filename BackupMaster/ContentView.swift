@@ -16,7 +16,7 @@ struct ContentView: View {
             List {
                 BMSection("Albums") {
                     if (viewModel.photoAccessGranted) {
-                        ForEach($viewModel.albums, id: \.album.id) { $albumVM in
+                        ForEach($viewModel.albums, id: \.album.name) { $albumVM in // The id needs to be name and not id otherwise photos aren't updated when deleted or created
                             if (albumVM.shouldShowAlbum || editMode.isEditing) {
                                 HStack {
                                     if editMode.isEditing {
@@ -25,7 +25,9 @@ struct ContentView: View {
                                             .transition(.opacity)
                                             .transition(.move(edge: .leading))
                                     }
-                                    NavigationLink(value: albumVM.album) {
+                                    NavigationLink {
+                                        AlbumView(album: albumVM.album, columns: 5)
+                                    } label: {
                                         Label(albumVM.album.name, systemImage: "photo.on.rectangle.angled")
                                     }
                                 }
