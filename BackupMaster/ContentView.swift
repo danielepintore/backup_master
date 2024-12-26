@@ -63,18 +63,21 @@ struct ContentView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Button("Add Service", systemImage: "plus") {
-                            // TODO: Open the add service page
-                        }
-                        let editButtonText = editMode == .active ? "Done" : "Edit"
-                        Button(editButtonText, systemImage: "pencil") {
-                            withAnimation {
-                                editMode = editMode == .active ? EditMode.inactive : EditMode.active
+                    if editMode == .inactive {
+                        Menu {
+                            Button("Add Service", systemImage: "plus") {
+                                // TODO: Open the add service page
                             }
+                            Button("Edit", systemImage: "pencil") {
+                                toggleEditMode()
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
                         }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
+                    } else {
+                        Button("Done") {
+                            toggleEditMode()
+                        }
                     }
                 }
             }
@@ -94,6 +97,12 @@ struct ContentView: View {
     }
 
     private func moveService(from source: IndexSet, to destination: Int) {
+    }
+    
+    private func toggleEditMode() {
+        withAnimation {
+            editMode = editMode == .active ? EditMode.inactive : EditMode.active
+        }
     }
 }
 
