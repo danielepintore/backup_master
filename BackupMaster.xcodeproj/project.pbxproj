@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		6436A49C2D1CC3E9007C3B97 /* AlbumView+ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6436A49B2D1CC3E9007C3B97 /* AlbumView+ViewModel.swift */; };
+		6436A4F82D1E3380007C3B97 /* CryptomatorCloudAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 6436A4F72D1E3380007C3B97 /* CryptomatorCloudAccess */; };
+		6436A4FA2D1E3380007C3B97 /* CryptomatorCloudAccessCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6436A4F92D1E3380007C3B97 /* CryptomatorCloudAccessCore */; };
 		648102EF2D062B3A00ADEC28 /* ServiceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648102EE2D062B3A00ADEC28 /* ServiceSettingsView.swift */; };
 		649A6E992D037B8700C18FC3 /* BackupMasterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649A6E982D037B8700C18FC3 /* BackupMasterApp.swift */; };
 		649A6E9B2D037B8700C18FC3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649A6E9A2D037B8700C18FC3 /* ContentView.swift */; };
@@ -48,6 +50,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6436A4FA2D1E3380007C3B97 /* CryptomatorCloudAccessCore in Frameworks */,
+				6436A4F82D1E3380007C3B97 /* CryptomatorCloudAccess in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -172,6 +176,9 @@
 				Base,
 			);
 			mainGroup = 649A6E8C2D037B8700C18FC3;
+			packageReferences = (
+				6436A4F62D1E3380007C3B97 /* XCRemoteSwiftPackageReference "cloud-access-swift" */,
+			);
 			productRefGroup = 649A6E962D037B8700C18FC3 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -431,6 +438,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6436A4F62D1E3380007C3B97 /* XCRemoteSwiftPackageReference "cloud-access-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/cryptomator/cloud-access-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.12.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6436A4F72D1E3380007C3B97 /* CryptomatorCloudAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6436A4F62D1E3380007C3B97 /* XCRemoteSwiftPackageReference "cloud-access-swift" */;
+			productName = CryptomatorCloudAccess;
+		};
+		6436A4F92D1E3380007C3B97 /* CryptomatorCloudAccessCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6436A4F62D1E3380007C3B97 /* XCRemoteSwiftPackageReference "cloud-access-swift" */;
+			productName = CryptomatorCloudAccessCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 649A6E8D2D037B8700C18FC3 /* Project object */;
 }
