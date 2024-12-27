@@ -11,7 +11,9 @@ import Photos
 struct AlbumView: View {
     let columnsCount: Int
     let spacingPercentage: Int
-    @State private var viewModel: AlbumView.ViewModel
+    @ObservedObject private var viewModel: AlbumView.ViewModel
+    @State private var panGesture: UIPanGestureRecognizer?
+    @State private var properties: SelectionProperties = .init()
     
     init(album: Album, columns: Int = 4, spacingPercentage: Int = 2) {
         self.viewModel = ViewModel(album: album)
@@ -22,7 +24,7 @@ struct AlbumView: View {
     var body: some View {
         GeometryReader { geometry in
             ScrollView {
-                Text("\(viewModel.album.assets.count) Elements")
+                Text("\(viewModel.assetsCount) Elements")
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .bold()
                     .padding()
@@ -33,14 +35,13 @@ struct AlbumView: View {
                 let spacing = geometry.size.width * spacingFactor / CGFloat(columnsCount)
                 let columns: [GridItem] = Array(repeating: .init(.flexible(minimum: 50), spacing: 0), count: columnsCount)
                 LazyVGrid(columns: columns, spacing: spacing){
-                    ForEach(viewModel.album.assets, id: \.self) { asset in
+                    ForEach($viewModel.assets, id: \.asset.localIdentifier) { $assetVM in
                         ZStack(alignment: .bottomLeading) {
-                            PhotoView(asset: asset, imageSize: imageSize, qualityFactor: 1.5)
-                            if (viewModel.isSelectionActive && viewModel.selection.contains(asset)) {
+                            PhotoView(asset: assetVM.asset, imageSize: imageSize, qualityFactor: 1.5)
+                            if (viewModel.isSelectionActive && assetVM.isSelected) {
                                 Rectangle()
                                     .frame(width: imageSize.width, height: imageSize.height)
                                     .foregroundStyle(Color.white.opacity(0.4))
-                                    .animation(.default, value: viewModel.selection)
                                     .zIndex(1) // Animation fix
                                 Image(systemName: "checkmark.circle.fill")
                                     .resizable()
@@ -53,18 +54,23 @@ struct AlbumView: View {
                                     .zIndex(1) // Animation fix
                             }
                         }
-                        .animation(.default, value: viewModel.selection)
+                        .onGeometryChange(for: CGRect.self, of: {
+                            $0.frame(in: .global)
+                        }, action: { newValue in
+                            assetVM.location = newValue
+                        })
+                        .animation(.default, value: assetVM.isSelected)
                         .animation(.default, value: viewModel.isSelectionActive)
-//                        .border(Color.red, width: 2) // Adding a black border
                         .onTapGesture {
-                            viewModel.toggleAssetSelection(for: asset)
+                            assetVM.isSelected.toggle()
                         }
                     }
-                    .animation(.bouncy, value: viewModel.album.assets)
+                    .animation(.bouncy, value: viewModel.assetsCount)
                     //.border(Color.primary, width: 2) // Adding a black border}
                 }
             }
             .navigationTitle(viewModel.album.name)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: {
@@ -77,6 +83,10 @@ struct AlbumView: View {
             .overlay(alignment: .topTrailing, content: {
                 Button {
                     viewModel.isSelectionActive.toggle()
+                    // Clean selection
+                    if !viewModel.isSelectionActive {
+                        viewModel.cleanAssetSelection()
+                    }
                 } label: {
                     Text(viewModel.isSelectionActive ? "Done": "Select")
                         .font(.footnote)
@@ -89,14 +99,87 @@ struct AlbumView: View {
                 .padding()
                 .animation(.default, value: viewModel.isSelectionActive)
             })
+            .onChange(of: viewModel.isSelectionActive, { oldValue, newValue in
+                panGesture?.isEnabled = newValue
+            })
+            .gesture(
+                PanGesture { gesture in
+                    if panGesture == nil {
+                        panGesture = gesture
+                        gesture.isEnabled = viewModel.isSelectionActive
+                    }
+                    let state = gesture.state
+                    
+                    if state == .began || state == .changed {
+                        onGestureChange(viewModel: viewModel, gesture: gesture)
+                    } else {
+                        onGestureEnded(viewModel: viewModel, gesture: gesture)
+                    }
+                }
+            )
             //            .sheet(isPresented: $isSheetPresented, content: {
             //                UploadSheet()
             //                    .presentationDetents([.fraction(0.4)])
             //            })
         }
     }
+    
+    // Gesture OnChanged
+    private func onGestureChange(viewModel: AlbumView.ViewModel, gesture: UIPanGestureRecognizer) {
+        let position = gesture.location(in: gesture.view)
+        // fallingIndex is the index where the finger is currently
+        if let fallingIndex = viewModel.assets.firstIndex(where: {$0.location.contains(position)}) {
+            if properties.start == nil {
+                properties.start = fallingIndex
+                properties.isDeleteDrag = viewModel.assets[fallingIndex].isSelected
+            }
+            
+            if let maxIndex = properties.maxIndex {
+                if maxIndex < fallingIndex {
+                    properties.maxIndex = fallingIndex
+                }
+            } else {
+                properties.maxIndex = fallingIndex
+            }
+            
+            if let minIndex = properties.minIndex {
+                if minIndex > fallingIndex {
+                    properties.minIndex = fallingIndex
+                }
+            } else {
+                properties.minIndex = fallingIndex
+            }
+            
+            properties.end = fallingIndex
+            
+            // Apply selection and deselection
+            if let start = properties.start, let end = properties.end, let maxIndex = properties.maxIndex, let minIndex = properties.minIndex {
+                let indices = start > end ? end...start : start...end
+                let indicesToRemove = start > end ? minIndex...end : end...maxIndex
+                viewModel.setAssetSelection(in: indicesToRemove, value: false)
+                viewModel.setAssetSelection(in: indices, value: properties.isDeleteDrag ? false : true)
+            }
+        }
+    }
+    
+    // Gesture OnEnded
+    private func onGestureEnded(viewModel: AlbumView.ViewModel, gesture: UIPanGestureRecognizer) {
+        properties.start = nil
+        properties.end = nil
+        properties.maxIndex = nil
+        properties.minIndex = nil
+        properties.isDeleteDrag = false
+    }
+    
+    
+    struct SelectionProperties {
+        var start: Int?
+        var end: Int?
+        var maxIndex: Int?
+        var minIndex: Int?
+        var isDeleteDrag: Bool = false
+    }
 }
-
 //struct UploadSheet: View {
 //    var photoCount = 23
 //    var services = ["WebDAV", "FTP", "SMB", "BackBlaze"]
