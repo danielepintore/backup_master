@@ -43,7 +43,8 @@ struct PhotoView: View {
                 .contentShape(Rectangle())
                 .clipped()
             } else {
-                Text("Loading...")
+                ProgressView()
+                    .frame(width: imageSize.width, height: imageSize.height)
             }
         }
         .onAppear {
@@ -58,8 +59,10 @@ struct PhotoView: View {
         options.version = .current
         // New target size to improve quality
         let improvedImageSize = CGSize(width: imageSize.width * self.qualityFactor, height: imageSize.height * self.qualityFactor)
-        PHImageManager.default().requestImage(for: asset, targetSize: improvedImageSize, contentMode: .aspectFill, options: options) { (image, info) in
-            self.image = image
+        DispatchQueue.global(qos: .userInitiated).async {
+            PHImageManager.default().requestImage(for: asset, targetSize: improvedImageSize, contentMode: .aspectFill, options: options) { (image, info) in
+                self.image = image
+            }
         }
     }
 }
