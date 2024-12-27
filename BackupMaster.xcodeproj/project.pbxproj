@@ -39,6 +39,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		6436A4F32D1E2EF5007C3B97 /* Gestures */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Gestures; sourceTree = "<group>"; };
 		8B19FC8F2D0B7316009931D0 /* GenericViews */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = GenericViews; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -77,6 +78,7 @@
 				64D1807E2D05BB4100469C51 /* Models */,
 				64D1807D2D05B5EA00469C51 /* ViewModels */,
 				649F3C982D04EC3E0087B81C /* Views */,
+				6436A4F32D1E2EF5007C3B97 /* Gestures */,
 				649A6E9E2D037B8A00C18FC3 /* Preview Content */,
 				649F3C952D04CEDC0087B81C /* Info.plist */,
 				649A6E9C2D037B8A00C18FC3 /* Assets.xcassets */,
@@ -138,6 +140,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				6436A4F32D1E2EF5007C3B97 /* Gestures */,
 				8B19FC8F2D0B7316009931D0 /* GenericViews */,
 			);
 			name = BackupMaster;
