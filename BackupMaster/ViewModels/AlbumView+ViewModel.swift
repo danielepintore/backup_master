@@ -23,6 +23,7 @@ extension AlbumView {
     
     @Observable
     class ViewModel: ObservableObject {
+        private var observation: NSKeyValueObservation? = nil
         private(set) var album: Album
         private(set) var backupServiceManager: BackupServiceManager
         var assets: [AssetViewModel]
@@ -91,7 +92,15 @@ extension AlbumView {
                                             reject(NSError(domain: "assetGetURL", code: 0, userInfo: [NSLocalizedDescriptionKey: "Can't get the asset URL"]))
                                             return
                                         }
-                                        provider.uploadFile(from: assetURL, to: uploadPath.appendingPathComponent(assetURL.lastPathComponent), replaceExisting: true).then{ metadata in
+                                        provider.uploadFile(from: assetURL, to: uploadPath.appendingPathComponent(assetURL.lastPathComponent), replaceExisting: true, onTaskCreation: { uploadTask in
+                                            uploadTask?.resume()
+                                            DispatchQueue.main.async {
+                                                guard let uploadTask = uploadTask else { return }
+                                                self.observation = uploadTask.progress.observe(\.fractionCompleted) { progress, _ in
+                                                    debugPrint("Upload progress of \(assetURL.lastPathComponent) is at: \(Int(progress.fractionCompleted * 100))%")
+                                                }
+                                            }
+                                        }).then{ metadata in
                                             debugPrint("uploading asset: \(metadata.name) complete.")
                                             fulfill(())
                                         }.catch{ error in
