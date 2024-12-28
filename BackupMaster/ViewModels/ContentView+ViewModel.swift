@@ -46,9 +46,9 @@ extension ContentView {
         }
         
         init(backupServiceManager: BackupServiceManager) {
+            self.backupServiceManager = backupServiceManager
             super.init()
             PHPhotoLibrary.shared().register(self)
-            self.backupServiceManager = backupServiceManager
             photoAccessGranted = photoLibraryAuthorization == .authorized || photoLibraryAuthorization == .limited
             loadAlbums()
         }
