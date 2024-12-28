@@ -42,6 +42,7 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6436A4F32D1E2EF5007C3B97 /* Gestures */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Gestures; sourceTree = "<group>"; };
+		6477D9BA2D1F00270027F0D0 /* Services */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Services; sourceTree = "<group>"; };
 		8B19FC8F2D0B7316009931D0 /* GenericViews */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = GenericViews; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -77,6 +78,7 @@
 		649A6E972D037B8700C18FC3 /* BackupMaster */ = {
 			isa = PBXGroup;
 			children = (
+				6477D9BA2D1F00270027F0D0 /* Services */,
 				649A6E982D037B8700C18FC3 /* BackupMasterApp.swift */,
 				649A6E9A2D037B8700C18FC3 /* ContentView.swift */,
 				64D1807E2D05BB4100469C51 /* Models */,
@@ -145,6 +147,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				6436A4F32D1E2EF5007C3B97 /* Gestures */,
+				6477D9BA2D1F00270027F0D0 /* Services */,
 				8B19FC8F2D0B7316009931D0 /* GenericViews */,
 			);
 			name = BackupMaster;
@@ -354,6 +357,8 @@
 				INFOPLIST_FILE = BackupMaster/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Backup Master";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "We need access to you network to access local server if you have configured one";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Your photo library is required to save your photos to the service you choose.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app lets you backup your photo library.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -392,6 +397,8 @@
 				INFOPLIST_FILE = BackupMaster/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Backup Master";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "We need access to you network to access local server if you have configured one";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Your photo library is required to save your photos to the service you choose.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app lets you backup your photo library.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
