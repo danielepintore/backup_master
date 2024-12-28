@@ -7,6 +7,8 @@
 
 import Foundation
 import Photos
+import Promises
+import CryptomatorCloudAccessCore
 
 extension AlbumView {
     struct AssetViewModel {
@@ -51,5 +53,64 @@ extension AlbumView {
                 }
             }
         }
+        
+        private func createDir(path: CloudPath) -> Promise<Void> {
+            return Promise { fulfill, reject in
+                guard let provider = self.backupServiceManager.userServices[0].provider else {
+                    reject(NSError(domain: "createDirError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Provider not found"]))
+                    return
+                }
+                
+                provider.createFolderIfMissing(at: path).then {
+                    debugPrint("Folder created successfully at \(path.path)")
+                    fulfill(()) // Resolve the promise successfully
+                }.catch { error in
+                    debugPrint("Error while creating a folder: \(error.localizedDescription)")
+                    reject(error) // Reject the promise with the error
+                }
+            }
+        }
+
+        
+        func uploadAssets() {
+            debugPrint("Starting upload...")
+            if let provider = self.backupServiceManager.userServices[0].provider {
+                let serialQueue = DispatchQueue(label: "com.example.uploadQueue")
+                let uploadPath = CloudPath("\(self.album.name)")
+                let selectedItems = self.isSelectionActive ? self.assets.filter({ $0.isSelected }) : self.assets
+                createDir(path: uploadPath).then {
+                    var lastPromise = Promise<Void>(())  // Start with a resolved promise
+                    for assetVM in selectedItems {
+                        lastPromise = lastPromise.then {
+                            return Promise { fulfill, reject in
+                                serialQueue.async {
+                                    assetVM.asset.getFileURL { url in
+                                        guard let assetURL = url else {
+                                            // no url
+                                            debugPrint("Failed to get assetURL")
+                                            reject(NSError(domain: "assetGetURL", code: 0, userInfo: [NSLocalizedDescriptionKey: "Can't get the asset URL"]))
+                                            return
+                                        }
+                                        provider.uploadFile(from: assetURL, to: uploadPath.appendingPathComponent(assetURL.lastPathComponent), replaceExisting: true).then{ metadata in
+                                            debugPrint("uploading asset: \(metadata.name) complete.")
+                                            fulfill(())
+                                        }.catch{ error in
+                                            debugPrint("Error in upload: \(error)")
+                                            reject(error)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    lastPromise.then {
+                        print("All assets uploaded successfully")
+                    }.catch { error in
+                        print("An error occurred: \(error)")
+                    }
+                }
+            }
+        }
     }
+        
 }

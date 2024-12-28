@@ -75,6 +75,7 @@ struct AlbumView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: {
                         //                        isSheetPresented.toggle()
+                        viewModel.uploadAssets()
                     }) {
                         Image(systemName: "icloud.and.arrow.up")
                     }
