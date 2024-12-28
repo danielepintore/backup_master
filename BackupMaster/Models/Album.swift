@@ -51,3 +51,46 @@ class Album: Identifiable, Equatable, Hashable {
         }
     }
 }
+
+extension PHAsset {
+    // TODO: write this as promise
+    // TODO: move this to another place
+    func getFileURL(completion: @escaping (URL?) -> Void) {
+        let options = PHAssetResourceRequestOptions()
+        options.isNetworkAccessAllowed = true // Allow fetching from iCloud if needed
+        
+        let resources = PHAssetResource.assetResources(for: self)
+        guard let resource = resources.first(where: { $0.type == .photo || $0.type == .video }) else {
+            completion(nil)
+            return
+        }
+        
+        // Create a temporary directory to store the file
+        let tempDirectory = FileManager.default.temporaryDirectory
+        let tempFileURL = tempDirectory.appendingPathComponent(resource.originalFilename)
+        
+        // Remove the file if it already exists
+        // if we already have a file we get a strange error in writeData
+        // we should find a better way to
+        if FileManager.default.fileExists(atPath: tempFileURL.path) {
+            do {
+                try FileManager.default.removeItem(at: tempFileURL)
+//                print("Existing file removed: \(tempFileURL)")
+            } catch {
+//                print("Error removing existing file: \(error)")
+                completion(nil)
+                return
+            }
+        }
+        
+        // Write the asset resource to the temp file
+        PHAssetResourceManager.default().writeData(for: resource, toFile: tempFileURL, options: options) { error in
+            if let error = error {
+                print("Error writing asset to file: \(error)")
+                completion(nil)
+            } else {
+                completion(tempFileURL)
+            }
+        }
+    }
+}
