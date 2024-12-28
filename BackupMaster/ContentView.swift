@@ -9,8 +9,12 @@ import SwiftUI
 import Photos
 
 struct ContentView: View {
-    @State private var viewModel = ViewModel()
+    @State private var viewModel: ViewModel
     @State private var editMode: EditMode = .inactive;
+    
+    init(backupServiceManager: BackupServiceManager) {
+        self.viewModel = ViewModel(backupServiceManager: backupServiceManager)
+    }
     var body: some View {
         NavigationStack {
             List {
@@ -26,7 +30,7 @@ struct ContentView: View {
                                             .transition(.move(edge: .leading))
                                     }
                                     NavigationLink {
-                                        AlbumView(album: albumVM.album, columns: 5)
+                                        AlbumView(album: albumVM.album, backupServiceManager: viewModel.backupServiceManager, columns: 5)
                                     } label: {
                                         Label(albumVM.album.name, systemImage: "photo.on.rectangle.angled")
                                     }
@@ -42,7 +46,7 @@ struct ContentView: View {
                     }
                 }
                 BMSection("Services") {
-                    ForEach(viewModel.backupServices, id: \.name){ service in
+                    ForEach(BackupService.allCases, id: \.self){ service in
                         NavigationLink(value: service){
                             HStack {
                                 Label(service.name, systemImage: service.imageName)
@@ -61,7 +65,7 @@ struct ContentView: View {
             .listSectionSpacing(.compact)
             .navigationTitle("Backup Master")
             .navigationDestination(for: Album.self) { album in
-                AlbumView(album: album, columns: 5) // Allow user to select how many colums, need to save preference to userdefaults
+                AlbumView(album: album, backupServiceManager: viewModel.backupServiceManager, columns: 5) // Allow user to select how many colums, need to save preference to userdefaults
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -108,6 +112,6 @@ struct ContentView: View {
     }
 }
 
-#Preview {
-    ContentView()
-}
+//#Preview {
+//    ContentView()
+//}

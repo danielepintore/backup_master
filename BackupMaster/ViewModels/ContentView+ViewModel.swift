@@ -9,15 +9,6 @@ import Foundation
 import Photos
 import UIKit
 
-private let services: [BackupServices] = [
-    BackupServices(name: "WebDAV", imageName: "server.rack"),
-    BackupServices(name: "FTP", imageName: "server.rack"),
-    BackupServices(name: "SMB", imageName: "server.rack"),
-    BackupServices(name: "BackBlaze", imageName: "server.rack"),
-    BackupServices(name: "Amazon S3", imageName: "server.rack"),
-    BackupServices(name: "Google Photos", imageName: "server.rack"),
-]
-
 extension ContentView {
     struct AlbumViewModel {
         let album: Album
@@ -44,7 +35,7 @@ extension ContentView {
 extension ContentView {
     @Observable
     class ViewModel: NSObject, PHPhotoLibraryChangeObserver {
-        private(set) var backupServices: [BackupServices] = []
+        private(set) var backupServiceManager: BackupServiceManager
         var albums: [AlbumViewModel] = []
         private let fetchHiddenAlbum: Bool = true
         private(set) var photoAccessGranted: Bool = false
@@ -54,11 +45,11 @@ extension ContentView {
             }
         }
         
-        override init() {
+        init(backupServiceManager: BackupServiceManager) {
             super.init()
             PHPhotoLibrary.shared().register(self)
+            self.backupServiceManager = backupServiceManager
             photoAccessGranted = photoLibraryAuthorization == .authorized || photoLibraryAuthorization == .limited
-            backupServices = services
             loadAlbums()
         }
         

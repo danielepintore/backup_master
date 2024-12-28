@@ -15,8 +15,8 @@ struct AlbumView: View {
     @State private var panGesture: UIPanGestureRecognizer?
     @State private var properties: SelectionProperties = .init()
     
-    init(album: Album, columns: Int = 4, spacingPercentage: Int = 2) {
-        self.viewModel = ViewModel(album: album)
+    init(album: Album, backupServiceManager: BackupServiceManager, columns: Int = 4, spacingPercentage: Int = 2) {
+        self.viewModel = ViewModel(album: album, backupServiceManager: backupServiceManager)
         self.columnsCount = columns
         self.spacingPercentage = spacingPercentage
     }

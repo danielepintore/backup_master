@@ -22,17 +22,19 @@ extension AlbumView {
     @Observable
     class ViewModel: ObservableObject {
         private(set) var album: Album
+        private(set) var backupServiceManager: BackupServiceManager
         var assets: [AssetViewModel]
         var assetsCount: Int {
             get { assets.count }
         }
         var isSelectionActive: Bool = false
-
-        init(album: Album) {
+        
+        init(album: Album, backupServiceManager: BackupServiceManager) {
             self.album = album
             self.assets = album.assets.map { asset in
                 AssetViewModel(asset: asset, isSelected: false)
             }
+            self.backupServiceManager = backupServiceManager
         }
         
         func setAssetSelection(in range: ClosedRange<Int>, value: Bool) {
