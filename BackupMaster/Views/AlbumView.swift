@@ -62,7 +62,9 @@ struct AlbumView: View {
                         .animation(.default, value: assetVM.isSelected)
                         .animation(.default, value: viewModel.isSelectionActive)
                         .onTapGesture {
-                            assetVM.isSelected.toggle()
+                            if viewModel.isSelectionActive {
+                                assetVM.isSelected.toggle()
+                            }
                         }
                     }
                     .animation(.bouncy, value: viewModel.assetsCount)
