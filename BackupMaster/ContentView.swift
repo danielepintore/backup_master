@@ -11,6 +11,7 @@ import Photos
 struct ContentView: View {
     @State private var viewModel: ViewModel
     @State private var editMode: EditMode = .inactive;
+    @State private var showAddServiceSheet: Bool = false
     
     init(backupServiceManager: BackupServiceManager) {
         self.viewModel = ViewModel(backupServiceManager: backupServiceManager)
@@ -47,14 +48,12 @@ struct ContentView: View {
                 }
                 BMSection("Services") {
                     ForEach(BackupService.allCases, id: \.self){ service in
-                        NavigationLink(value: service){
-                            HStack {
-                                Label(service.name, systemImage: service.imageName)
-                            }
+                        NavigationLink {
+                            AccountListView(service: service, backupServiceManager: viewModel.backupServiceManager)
+                        } label: {
+                            Label(service.name, systemImage: service.imageName)
                         }
                     }
-                    .onMove(perform: moveService)
-                    .onDelete(perform: deleteService)
                 }
                 BMSection("Other") {
                     NavigationLink(destination: SettingsView()) {
@@ -64,15 +63,12 @@ struct ContentView: View {
             }
             .listSectionSpacing(.compact)
             .navigationTitle("Backup Master")
-            .navigationDestination(for: Album.self) { album in
-                AlbumView(album: album, backupServiceManager: viewModel.backupServiceManager, columns: 5) // Allow user to select how many colums, need to save preference to userdefaults
-            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     if editMode == .inactive {
                         Menu {
                             Button("Add Service", systemImage: "plus") {
-                                // TODO: Open the add service page
+                                showAddServiceSheet.toggle()
                             }
                             Button("Edit", systemImage: "pencil") {
                                 toggleEditMode()
@@ -87,6 +83,9 @@ struct ContentView: View {
                     }
                 }
             }
+            .sheet(isPresented: $showAddServiceSheet) {
+                UpdateServiceAccountView(backupServiceManager: viewModel.backupServiceManager)
+            }
             .environment(\.editMode, $editMode)
             .onAppear {
                 Task {
@@ -94,15 +93,6 @@ struct ContentView: View {
                 }
             }
         }
-    }
-    private func deleteService(at offsets: IndexSet) {
-        offsets.forEach { index in
-            let service = viewModel.backupServices[index]
-            print("Removing \(service.name)")
-        }
-    }
-
-    private func moveService(from source: IndexSet, to destination: Int) {
     }
     
     private func toggleEditMode() {

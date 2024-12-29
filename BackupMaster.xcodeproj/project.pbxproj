@@ -11,6 +11,8 @@
 		6436A4F82D1E3380007C3B97 /* CryptomatorCloudAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 6436A4F72D1E3380007C3B97 /* CryptomatorCloudAccess */; };
 		6436A4FA2D1E3380007C3B97 /* CryptomatorCloudAccessCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6436A4F92D1E3380007C3B97 /* CryptomatorCloudAccessCore */; };
 		648102EF2D062B3A00ADEC28 /* ServiceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648102EE2D062B3A00ADEC28 /* ServiceSettingsView.swift */; };
+		6484D72D2D2052D800C606AA /* UpdateServiceAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6484D72C2D2052D800C606AA /* UpdateServiceAccountView.swift */; };
+		6484D72F2D2053B000C606AA /* AccountListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6484D72E2D2053B000C606AA /* AccountListView.swift */; };
 		649A6E992D037B8700C18FC3 /* BackupMasterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649A6E982D037B8700C18FC3 /* BackupMasterApp.swift */; };
 		649A6E9B2D037B8700C18FC3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649A6E9A2D037B8700C18FC3 /* ContentView.swift */; };
 		649A6E9D2D037B8A00C18FC3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 649A6E9C2D037B8A00C18FC3 /* Assets.xcassets */; };
@@ -26,6 +28,8 @@
 /* Begin PBXFileReference section */
 		6436A49B2D1CC3E9007C3B97 /* AlbumView+ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlbumView+ViewModel.swift"; sourceTree = "<group>"; };
 		648102EE2D062B3A00ADEC28 /* ServiceSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceSettingsView.swift; sourceTree = "<group>"; };
+		6484D72C2D2052D800C606AA /* UpdateServiceAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateServiceAccountView.swift; sourceTree = "<group>"; };
+		6484D72E2D2053B000C606AA /* AccountListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountListView.swift; sourceTree = "<group>"; };
 		649A6E952D037B8700C18FC3 /* BackupMaster.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BackupMaster.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		649A6E982D037B8700C18FC3 /* BackupMasterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupMasterApp.swift; sourceTree = "<group>"; };
 		649A6E9A2D037B8700C18FC3 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -43,6 +47,7 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6436A4F32D1E2EF5007C3B97 /* Gestures */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Gestures; sourceTree = "<group>"; };
 		6477D9BA2D1F00270027F0D0 /* Services */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Services; sourceTree = "<group>"; };
+		6484D7302D205D7A00C606AA /* Services */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Services; sourceTree = "<group>"; };
 		8B19FC8F2D0B7316009931D0 /* GenericViews */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = GenericViews; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -103,11 +108,14 @@
 		649F3C982D04EC3E0087B81C /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				6484D7302D205D7A00C606AA /* Services */,
 				8B19FC8F2D0B7316009931D0 /* GenericViews */,
 				649F3C992D04EC5C0087B81C /* AlbumView.swift */,
 				649F3C9B2D04F3230087B81C /* PhotoView.swift */,
 				64D180852D061AAF00469C51 /* SettingsView.swift */,
 				648102EE2D062B3A00ADEC28 /* ServiceSettingsView.swift */,
+				6484D72C2D2052D800C606AA /* UpdateServiceAccountView.swift */,
+				6484D72E2D2053B000C606AA /* AccountListView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -148,6 +156,7 @@
 			fileSystemSynchronizedGroups = (
 				6436A4F32D1E2EF5007C3B97 /* Gestures */,
 				6477D9BA2D1F00270027F0D0 /* Services */,
+				6484D7302D205D7A00C606AA /* Services */,
 				8B19FC8F2D0B7316009931D0 /* GenericViews */,
 			);
 			name = BackupMaster;
@@ -208,6 +217,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6484D72F2D2053B000C606AA /* AccountListView.swift in Sources */,
 				64D180822D05C67100469C51 /* BackupServices.swift in Sources */,
 				6436A49C2D1CC3E9007C3B97 /* AlbumView+ViewModel.swift in Sources */,
 				64D180862D061AAF00469C51 /* SettingsView.swift in Sources */,
@@ -215,6 +225,7 @@
 				649A6E992D037B8700C18FC3 /* BackupMasterApp.swift in Sources */,
 				64D180842D05EF3100469C51 /* Album.swift in Sources */,
 				649F3C9C2D04F3230087B81C /* PhotoView.swift in Sources */,
+				6484D72D2D2052D800C606AA /* UpdateServiceAccountView.swift in Sources */,
 				649F3C9A2D04EC5C0087B81C /* AlbumView.swift in Sources */,
 				64D180802D05C54C00469C51 /* ContentView+ViewModel.swift in Sources */,
 				648102EF2D062B3A00ADEC28 /* ServiceSettingsView.swift in Sources */,

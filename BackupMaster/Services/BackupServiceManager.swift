@@ -21,6 +21,34 @@ class BackupServiceManager: ObservableObject{
                 debugPrint("Updated services!")
             }
     }
+    
+    func getCredentials<T>(for service: BackupService) -> [T] {
+        switch service {
+        case .webDav:
+            if T.self == WebDAVCredential.self {
+                if let credential = WebDavCredentialManager.shared.credentials as? [T] {
+                    return credential
+                }
+            }
+            return []
+        default:
+            return []
+        }
+    }
+    
+    func getCredential<T>(for service: BackupService, identifier: String) -> T? {
+        switch service {
+        case .webDav:
+            if T.self == WebDAVCredential.self {
+                if let credential = WebDavCredentialManager.shared.credentials.filter({ $0.identifier == identifier }).first as? T? {
+                    return credential
+                }
+            }
+            return nil
+        default:
+            return nil
+        }
+    }
 }
 
 extension BackupServiceManager {

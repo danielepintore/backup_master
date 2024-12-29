@@ -15,7 +15,7 @@ class WebDavCredentialManager: ObservableObject {
         instance.loadProviders()
         return instance
     }()
-    private var credentials: [WebDAVCredential] = []
+    private(set) var credentials: [WebDAVCredential] = []
     @Published private(set) var clientProviders: [ClientProvider] = []
     
     private func loadProviders() {
