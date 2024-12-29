@@ -36,7 +36,7 @@ struct AccountListView: View {
                 case .backblaze:
                     Text("Need Implementation")
                 case .webDav:
-                    let credentials: [WebDAVCredential] = backupServiceManager.getCredentials(for: service)
+                    let credentials: [WebDAVCredential] = backupServiceManager.credentials.webDav
                     ForEach(credentials, id: \.identifier) { credential in
                         NavigationLink(destination: UpdateServiceAccountView(identifier: credential.identifier, service: .webDav, backupServiceManager: backupServiceManager)) {
                             VStack(alignment: .leading){
