@@ -10,7 +10,6 @@
 		6436A49C2D1CC3E9007C3B97 /* AlbumView+ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6436A49B2D1CC3E9007C3B97 /* AlbumView+ViewModel.swift */; };
 		6436A4F82D1E3380007C3B97 /* CryptomatorCloudAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 6436A4F72D1E3380007C3B97 /* CryptomatorCloudAccess */; };
 		6436A4FA2D1E3380007C3B97 /* CryptomatorCloudAccessCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6436A4F92D1E3380007C3B97 /* CryptomatorCloudAccessCore */; };
-		648102EF2D062B3A00ADEC28 /* ServiceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648102EE2D062B3A00ADEC28 /* ServiceSettingsView.swift */; };
 		6484D72D2D2052D800C606AA /* UpdateServiceAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6484D72C2D2052D800C606AA /* UpdateServiceAccountView.swift */; };
 		6484D72F2D2053B000C606AA /* AccountListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6484D72E2D2053B000C606AA /* AccountListView.swift */; };
 		649A6E992D037B8700C18FC3 /* BackupMasterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649A6E982D037B8700C18FC3 /* BackupMasterApp.swift */; };
@@ -27,7 +26,6 @@
 
 /* Begin PBXFileReference section */
 		6436A49B2D1CC3E9007C3B97 /* AlbumView+ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlbumView+ViewModel.swift"; sourceTree = "<group>"; };
-		648102EE2D062B3A00ADEC28 /* ServiceSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceSettingsView.swift; sourceTree = "<group>"; };
 		6484D72C2D2052D800C606AA /* UpdateServiceAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateServiceAccountView.swift; sourceTree = "<group>"; };
 		6484D72E2D2053B000C606AA /* AccountListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountListView.swift; sourceTree = "<group>"; };
 		649A6E952D037B8700C18FC3 /* BackupMaster.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BackupMaster.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -113,7 +111,6 @@
 				649F3C992D04EC5C0087B81C /* AlbumView.swift */,
 				649F3C9B2D04F3230087B81C /* PhotoView.swift */,
 				64D180852D061AAF00469C51 /* SettingsView.swift */,
-				648102EE2D062B3A00ADEC28 /* ServiceSettingsView.swift */,
 				6484D72C2D2052D800C606AA /* UpdateServiceAccountView.swift */,
 				6484D72E2D2053B000C606AA /* AccountListView.swift */,
 			);
@@ -228,7 +225,6 @@
 				6484D72D2D2052D800C606AA /* UpdateServiceAccountView.swift in Sources */,
 				649F3C9A2D04EC5C0087B81C /* AlbumView.swift in Sources */,
 				64D180802D05C54C00469C51 /* ContentView+ViewModel.swift in Sources */,
-				648102EF2D062B3A00ADEC28 /* ServiceSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
