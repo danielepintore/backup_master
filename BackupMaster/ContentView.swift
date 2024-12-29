@@ -34,6 +34,9 @@ struct ContentView: View {
                                         Label(albumVM.album.name, systemImage: "photo.on.rectangle.angled")
                                     }
                                 }
+//                                .onTapGesture {
+//                                    albumVM.shouldShowAlbum.toggle()
+//                                }
                                 .animation(.default, value: editMode.isEditing)
                             }
                         }
@@ -44,12 +47,15 @@ struct ContentView: View {
                         }
                     }
                 }
-                BMSection("Services") {
-                    ForEach(BackupService.allCases, id: \.self){ service in
-                        NavigationLink {
-                            AccountListView(service: service, backupServiceManager: backupServiceManager)
-                        } label: {
-                            Label(service.name, systemImage: service.imageName)
+                let activeServices = Array(Set(backupServiceManager.userServices.compactMap({ $0.serviceType })))
+                if activeServices.count > 0 {
+                    BMSection("Services") {
+                        ForEach(activeServices, id: \.self){ service in
+                            NavigationLink {
+                                AccountListView(service: service, backupServiceManager: backupServiceManager)
+                            } label: {
+                                Label(service.name, systemImage: service.imageName)
+                            }
                         }
                     }
                 }

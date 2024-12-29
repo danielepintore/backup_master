@@ -20,6 +20,13 @@ struct AccountListView: View {
     var body: some View {
         List {
             BMSection("\(service.name) Accounts") {
+                Button("Add Account", systemImage: "plus", action: { })
+                    .overlay {
+                        NavigationLink(destination: UpdateServiceAccountView(service: service, backupServiceManager: backupServiceManager)) { }
+                            .opacity(0)
+                    }
+            }
+            Section {
                 switch service {
                 case .box:
                     Text("Need Implementation")
@@ -36,8 +43,7 @@ struct AccountListView: View {
                 case .backblaze:
                     Text("Need Implementation")
                 case .webDav:
-                    let credentials: [WebDAVCredential] = backupServiceManager.credentials.webDav
-                    ForEach(credentials, id: \.identifier) { credential in
+                    ForEach(backupServiceManager.credentials.webDav, id: \.identifier) { credential in
                         NavigationLink(destination: UpdateServiceAccountView(identifier: credential.identifier, service: .webDav, backupServiceManager: backupServiceManager)) {
                             VStack(alignment: .leading){
                                 Text(credential.identifier)

@@ -91,7 +91,7 @@ struct UpdateWebDavServiceView: View {
                     dismiss()
                     return
                 }
-                debugPrint("Failed to add the credential: \(name)")
+                debugPrint("Failed to add the credential")
             }
         }
         

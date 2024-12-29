@@ -20,14 +20,17 @@ class WebDavCredentialManager: ObservableObject {
     @Published private(set) var clientProviders: [ClientProvider] = []
     
     private func loadProviders() {
+        // Changes in clientProvider sends notification in the app
         // Load credentials from keychain
         credentials = retrieveAllFromKeychain(type: WebDAVCredential.self) ?? []
+        self.clientProviders.removeAll(keepingCapacity: true)
         // Create a client for each credential
         for credential in credentials {
             self.clientProviders.append(.init(client: .init(credential: credential)))
         }
         
         // We should implement a struct that holds the client and the provider together
+        /*
         for idx in self.clientProviders.indices {
             WebDAVAuthenticator.verifyClient(client: self.clientProviders[idx].client).then {
                 try self.clientProviders[idx].provider = .init(with: self.clientProviders[idx].client)
@@ -35,6 +38,7 @@ class WebDavCredentialManager: ObservableObject {
                 debugPrint("Error in loadProviders() of WebDavCredentialManager: \(error.localizedDescription)")
             }
         }
+         */
     }
     
     func saveToKeychain<T: Codable>(key: String, value: T) -> Bool {
@@ -100,9 +104,7 @@ class WebDavCredentialManager: ObservableObject {
         // Check if the operation was successful
         guard status == errSecSuccess, let dataArr = result as? [Data] else {
             debugPrint("Failed to retrieve credentials")
-            debugPrint(result!)
-            debugPrint(status)
-            return nil
+            return []
         }
 
         // Deserialize the data into the specified type
