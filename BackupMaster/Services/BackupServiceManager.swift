@@ -10,43 +10,25 @@ import CryptomatorCloudAccessCore
 import Combine
 
 class BackupServiceManager: ObservableObject{
-    private var cancellable: AnyCancellable?
+    private var webDavCancellable: AnyCancellable?
     @Published var userServices: [ServiceProvider] = []
+    @Published var credentials: ServicesCredentials = .init()
     
     init() {
         // Subscribe to updates from the singleton
-        cancellable = WebDavCredentialManager.shared.$clientProviders
+        webDavCancellable = WebDavCredentialManager.shared.$clientProviders
             .sink { [weak self] clientProviders in
                 self?.userServices = clientProviders.compactMap({ ServiceProvider(serviceType: .webDav, provider: $0.provider ?? nil) })
+                self?.credentials.webDav = WebDavCredentialManager.shared.credentials
                 debugPrint("Updated services!")
             }
     }
     
-    func getCredentials<T>(for service: BackupService) -> [T] {
-        switch service {
-        case .webDav:
-            if T.self == WebDAVCredential.self {
-                if let credential = WebDavCredentialManager.shared.credentials as? [T] {
-                    return credential
-                }
-            }
-            return []
-        default:
-            return []
-        }
-    }
-    
-    func getCredential<T>(for service: BackupService, identifier: String) -> T? {
-        switch service {
-        case .webDav:
-            if T.self == WebDAVCredential.self {
-                if let credential = WebDavCredentialManager.shared.credentials.filter({ $0.identifier == identifier }).first as? T? {
-                    return credential
-                }
-            }
-            return nil
-        default:
-            return nil
+    struct ServicesCredentials {
+        var webDav: [WebDAVCredential]
+        
+        init(webDavCredentials: [WebDAVCredential] = []) {
+            self.webDav = webDavCredentials
         }
     }
 }

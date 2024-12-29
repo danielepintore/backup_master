@@ -8,6 +8,7 @@
 // The credential manager is a singleton that manages all account for the service that handles
 import CryptomatorCloudAccessCore
 import SwiftUI
+import Security
 
 class WebDavCredentialManager: ObservableObject {
     static let shared = {
@@ -20,8 +21,7 @@ class WebDavCredentialManager: ObservableObject {
     
     private func loadProviders() {
         // Load credentials from keychain
-        // Test generate mock credential
-        credentials = [.init(baseURL: URL(string: "http://192.168.1.107:9090/")!, username: "daniele", password: "secret", allowedCertificate: nil, identifier: "webdav1-config")]
+        credentials = retrieveAllFromKeychain(type: WebDAVCredential.self) ?? []
         // Create a client for each credential
         for credential in credentials {
             self.clientProviders.append(.init(client: .init(credential: credential)))
@@ -37,49 +37,98 @@ class WebDavCredentialManager: ObservableObject {
         }
     }
     
-    // TODO: These fuctions needs to be checked, for the moment they work as placeholders
-//    func saveToKeychain<T: Codable>(key: String, value: T) -> Bool {
-//        // Serialize the object to Data
-//        guard let valueData = try? JSONEncoder().encode(value) else {
-//            return false
-//        }
-//        
-//        // Create a dictionary with the keychain item attributes
-//        let query: [String: Any] = [
-//            kSecClass as String: kSecClassGenericPassword,
-//            kSecAttrAccount as String: key,
-//            kSecValueData as String: valueData
-//        ]
-//        
-//        // First, try to delete any existing item with the same key
-//        SecItemDelete(query as CFDictionary)
-//        
-//        // Add the new item to the Keychain
-//        let status = SecItemAdd(query as CFDictionary, nil)
-//        
-//        return status == errSecSuccess
-//    }
-//    
-//    func retrieveFromKeychain<T: Codable>(key: String, type: T.Type) -> T? {
-//        // Create a query to find the data
-//        let query: [String: Any] = [
-//            kSecClass as String: kSecClassGenericPassword,
-//            kSecAttrAccount as String: key,
-//            kSecReturnData as String: true,
-//            kSecMatchLimit as String: kSecMatchLimitOne
-//        ]
-//        
-//        var result: AnyObject?
-//        let status = SecItemCopyMatching(query as CFDictionary, &result)
-//        
-//        // Check if the operation was successful
-//        guard status == errSecSuccess, let data = result as? Data else {
-//            return nil
-//        }
-//        
-//        // Deserialize the data into the specified type
-//        return try? JSONDecoder().decode(type, from: data)
-//    }
+    func saveToKeychain<T: Codable>(key: String, value: T) -> Bool {
+        // Serialize the object to Data
+        guard let valueData = try? JSONEncoder().encode(value) else {
+            return false
+        }
+        
+        // Create a dictionary with the keychain item attributes
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: key,
+            kSecAttrService as String: "webdav-credentials", // used to group the same kind of credentials
+            kSecValueData as String: valueData
+        ]
+        
+        // First, try to delete any existing item with the same key
+        SecItemDelete(query as CFDictionary)
+        
+        // Add the new item to the Keychain
+        let status = SecItemAdd(query as CFDictionary, nil)
+        
+        if status  == errSecSuccess {
+            loadProviders()
+        }
+        
+        return status == errSecSuccess
+    }
+    
+    func retrieveFromKeychain<T: Codable>(key: String, type: T.Type) -> T? {
+        // Create a query to find the data
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: key,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        
+        // Check if the operation was successful
+        guard status == errSecSuccess, let data = result as? Data else {
+            return nil
+        }
+        
+        // Deserialize the data into the specified type
+        return try? JSONDecoder().decode(type, from: data)
+    }
+    
+    private func retrieveAllFromKeychain<T: Codable>(type: T.Type) -> [T]? {
+        // Create a query to find the data
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: "webdav-credentials", // used to group the same kind of credentials
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitAll
+        ]
+        
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        
+        // Check if the operation was successful
+        guard status == errSecSuccess, let dataArr = result as? [Data] else {
+            debugPrint("Failed to retrieve credentials")
+            debugPrint(result!)
+            debugPrint(status)
+            return nil
+        }
+
+        // Deserialize the data into the specified type
+        let decoder = JSONDecoder()
+        return dataArr.map({ try? decoder.decode(type, from: $0) }) as? [T]
+    }
+    
+    func deleteFromKeychain(key: String) -> Bool {
+        // Create a dictionary with the keychain item attributes
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: key,
+            kSecAttrService as String: "webdav-credentials" // Match the same service used for saving
+        ]
+        
+        // Attempt to delete the item from the Keychain
+        let status = SecItemDelete(query as CFDictionary)
+        
+        if status  == errSecSuccess {
+            loadProviders()
+        }
+        
+        // Return true if the item was successfully deleted, or false otherwise
+        return status == errSecSuccess || status == errSecItemNotFound
+    }
+
 }
 
 extension WebDavCredentialManager {
