@@ -35,7 +35,6 @@ extension ContentView {
 extension ContentView {
     @Observable
     class ViewModel: NSObject, PHPhotoLibraryChangeObserver {
-        private(set) var backupServiceManager: BackupServiceManager
         var albums: [AlbumViewModel] = []
         private let fetchHiddenAlbum: Bool = true
         private(set) var photoAccessGranted: Bool = false
@@ -45,8 +44,7 @@ extension ContentView {
             }
         }
         
-        init(backupServiceManager: BackupServiceManager) {
-            self.backupServiceManager = backupServiceManager
+        override init() {
             super.init()
             PHPhotoLibrary.shared().register(self)
             photoAccessGranted = photoLibraryAuthorization == .authorized || photoLibraryAuthorization == .limited

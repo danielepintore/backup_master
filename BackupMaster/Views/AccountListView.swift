@@ -10,7 +10,7 @@ import CryptomatorCloudAccessCore
 
 struct AccountListView: View {
     private let service: BackupService
-    private var backupServiceManager: BackupServiceManager
+    @ObservedObject private var backupServiceManager: BackupServiceManager
     
     init(service: BackupService, backupServiceManager: BackupServiceManager) {
         self.service = service

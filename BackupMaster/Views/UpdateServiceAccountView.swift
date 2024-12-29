@@ -14,7 +14,7 @@ struct UpdateServiceAccountView: View {
     @State private var service: BackupService?
     // credentialIdentifier is a String that allows us to retrieve a credential from Keychain
     private var credentialIdentifier: String?
-    private var backupServiceManager: BackupServiceManager
+    @ObservedObject private var backupServiceManager: BackupServiceManager
     private var showServicePicker: Bool
 
     init(identifier: String? = nil, service: BackupService? = nil, backupServiceManager: BackupServiceManager) {

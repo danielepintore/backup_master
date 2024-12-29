@@ -9,13 +9,11 @@ import SwiftUI
 import Photos
 
 struct ContentView: View {
-    @State private var viewModel: ViewModel
+    @ObservedObject private(set) var backupServiceManager: BackupServiceManager
+    @State private var viewModel: ViewModel = ViewModel()
     @State private var editMode: EditMode = .inactive;
     @State private var showAddServiceSheet: Bool = false
     
-    init(backupServiceManager: BackupServiceManager) {
-        self.viewModel = ViewModel(backupServiceManager: backupServiceManager)
-    }
     var body: some View {
         NavigationStack {
             List {
@@ -31,7 +29,7 @@ struct ContentView: View {
                                             .transition(.move(edge: .leading))
                                     }
                                     NavigationLink {
-                                        AlbumView(album: albumVM.album, backupServiceManager: viewModel.backupServiceManager, columns: 5)
+                                        AlbumView(album: albumVM.album, backupServiceManager: backupServiceManager, columns: 5)
                                     } label: {
                                         Label(albumVM.album.name, systemImage: "photo.on.rectangle.angled")
                                     }
@@ -49,7 +47,7 @@ struct ContentView: View {
                 BMSection("Services") {
                     ForEach(BackupService.allCases, id: \.self){ service in
                         NavigationLink {
-                            AccountListView(service: service, backupServiceManager: viewModel.backupServiceManager)
+                            AccountListView(service: service, backupServiceManager: backupServiceManager)
                         } label: {
                             Label(service.name, systemImage: service.imageName)
                         }
@@ -84,7 +82,7 @@ struct ContentView: View {
                 }
             }
             .sheet(isPresented: $showAddServiceSheet) {
-                UpdateServiceAccountView(backupServiceManager: viewModel.backupServiceManager)
+                UpdateServiceAccountView(backupServiceManager: backupServiceManager)
             }
             .environment(\.editMode, $editMode)
             .onAppear {

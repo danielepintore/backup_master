@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct BackupMasterApp: App {
-    @ObservedObject private var backupServiceManager = BackupServiceManager()
+    @StateObject private var backupServiceManager = BackupServiceManager()
     var body: some Scene {
         WindowGroup {
             ContentView(backupServiceManager: backupServiceManager)
