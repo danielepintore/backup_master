@@ -156,6 +156,12 @@ struct AlbumView: View {
                     }
                 }
             )
+            .onAppear {
+                UIApplication.shared.isIdleTimerDisabled = true
+            }
+            .onDisappear {
+                UIApplication.shared.isIdleTimerDisabled = false
+            }
             //            .sheet(isPresented: $isSheetPresented, content: {
             //                UploadSheet()
             //                    .presentationDetents([.fraction(0.4)])
