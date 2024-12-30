@@ -32,7 +32,7 @@ struct UpdateWebDavServiceView: View {
         if let id = identifier {
             self.identifier = id
             // fetch credential and initialize state vars
-            self.credential = backupServiceManager.credentials.webDav.first(where: { $0.identifier == id })
+            self.credential = backupServiceManager.services.webdav.first(where: { $0.credential.identifier == id })?.credential
             if let credential = self.credential {
                 _name = State(initialValue: id)
                 _host = State(initialValue: credential.baseURL.host() ?? "")

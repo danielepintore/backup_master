@@ -17,18 +17,17 @@ class WebDavCredentialManager: ObservableObject {
         instance.loadProviders()
         return instance
     }()
-    private(set) var credentials: [WebDAVCredential] = []
-    @Published private(set) var clientProviders: [ClientProvider] = []
+    @Published private(set) var configClientProviders: [ConfigClientProvider] = []
     
     private func loadProviders() {
         // Changes in clientProvider sends notification in the app
         // Load credentials from keychain
-        credentials = retrieveAllFromKeychain(type: WebDAVCredential.self) ?? []
-        self.clientProviders.removeAll(keepingCapacity: true)
+        let credentials = retrieveAllFromKeychain(type: WebDAVCredential.self) ?? []
+        self.configClientProviders.removeAll(keepingCapacity: true)
         // Create a client for each credential
         for credential in credentials {
             let client: WebDAVClient = .init(credential: credential)
-            try? self.clientProviders.append(.init(client: client, provider: .init(with: client)))
+            try? self.configClientProviders.append(.init(credential: credential, client: client, provider: .init(with: client)))
         }
         
         // We should implement a struct that holds the client and the provider together
@@ -136,23 +135,22 @@ class WebDavCredentialManager: ObservableObject {
 }
 
 extension WebDavCredentialManager {
-    class ClientProvider {
+    class ConfigClientProvider {
+        var credential: WebDAVCredential
         var client: WebDAVClient
         var provider: WebDAVProvider?
         // provider is loaded in an async fashion
         var isProviderLoaded: Bool = false
         
-        init(client: WebDAVClient, provider: WebDAVProvider? = nil) {
+        init(credential: WebDAVCredential, client: WebDAVClient, provider: WebDAVProvider? = nil) {
+            self.credential = credential
             self.client = client
             self.provider = provider
             self.isProviderLoaded = provider != nil ? true : false
         }
         
-//        func initializeProvider() throws -> Promise<Void> {
-//            WebDAVAuthenticator.verifyClient(client: self.client).then {
-//                try self.provider = .init(with: self.client)
-//                self.isProviderLoaded = true
-//            }
-//        }
+        func checkClient() throws -> Promise<Void> {
+            WebDAVAuthenticator.verifyClient(client: client)
+        }
     }
 }

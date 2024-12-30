@@ -12,11 +12,13 @@ struct AlbumView: View {
     let columnsCount: Int
     let spacingPercentage: Int
     @ObservedObject private var viewModel: AlbumView.ViewModel
+    @ObservedObject private(set) var backupServiceManager: BackupServiceManager
     @State private var panGesture: UIPanGestureRecognizer?
     @State private var properties: SelectionProperties = .init()
     
     init(album: Album, backupServiceManager: BackupServiceManager, columns: Int = 4, spacingPercentage: Int = 2) {
-        self.viewModel = ViewModel(album: album, backupServiceManager: backupServiceManager)
+        self.viewModel = ViewModel(album: album)
+        self.backupServiceManager = backupServiceManager
         self.columnsCount = columns
         self.spacingPercentage = spacingPercentage
     }

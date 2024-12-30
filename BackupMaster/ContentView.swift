@@ -47,9 +47,9 @@ struct ContentView: View {
                         }
                     }
                 }
-                if backupServiceManager.providers.activeServices.count > 0 {
+                if backupServiceManager.services.activeServices.count > 0 {
                     BMSection("Services") {
-                        ForEach(backupServiceManager.providers.activeServices, id: \.self){ service in
+                        ForEach(backupServiceManager.services.activeServices, id: \.self){ service in
                             NavigationLink {
                                 AccountListView(service: service, backupServiceManager: backupServiceManager)
                             } label: {

@@ -11,29 +11,20 @@ import Combine
 
 class BackupServiceManager: ObservableObject{
     private var webDavCancellable: AnyCancellable?
-    @Published var credentials: ServicesCredentials = .init()
-    @Published var providers: ServiceProviders = .init()
+    @Published var services: Services = .init()
     
     init() {
         // Subscribe to updates from the singleton
-        webDavCancellable = WebDavCredentialManager.shared.$clientProviders
-            .sink { [weak self] clientProviders in
-                self?.providers.webdav = clientProviders.compactMap({ $0.provider })
-                self?.credentials.webDav = WebDavCredentialManager.shared.credentials
+        webDavCancellable = WebDavCredentialManager.shared.$configClientProviders
+            .sink { [weak self] configClientProviders in
+                self?.services.webdav.removeAll(keepingCapacity: true)
+                self?.services.webdav.append(contentsOf: configClientProviders)
                 debugPrint("Updated services!")
             }
     }
     
-    struct ServicesCredentials {
-        var webDav: [WebDAVCredential]
-        
-        init(webDavCredentials: [WebDAVCredential] = []) {
-            self.webDav = webDavCredentials
-        }
-    }
-    
-    struct ServiceProviders {
-        var webdav: [CloudProvider]
+    struct Services {
+        var webdav: [WebDavCredentialManager.ConfigClientProvider]
         var activeServices: [BackupService] {
             get {
                 var services: [BackupService] = []
@@ -42,7 +33,16 @@ class BackupServiceManager: ObservableObject{
                 return services
             }
         }
-        init(webdav: [CloudProvider] = []) {
+        var providers: [CloudProvider] {
+            get {
+                var providers: [CloudProvider] = []
+                if webdav.count > 0 { providers.append(contentsOf: webdav.compactMap({ $0.provider }))}
+                // implement for other services
+                return providers
+            }
+        }
+        
+        init(webdav: [WebDavCredentialManager.ConfigClientProvider] = []) {
             self.webdav = webdav
         }
     }
