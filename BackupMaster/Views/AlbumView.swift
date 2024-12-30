@@ -77,12 +77,46 @@ struct AlbumView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: {
-                        //                        isSheetPresented.toggle()
-                        viewModel.uploadAssets()
-                    }) {
-                        Image(systemName: "icloud.and.arrow.up")
+                    if self.backupServiceManager.services.providers.count == 0 {
+                        NavigationLink(destination: UpdateServiceAccountView(backupServiceManager: backupServiceManager)) {
+                            Image(systemName: "icloud.and.arrow.up")
+                        }
+                    } else if self.backupServiceManager.services.providers.count == 1 {
+                        Button("", systemImage: "icloud.and.arrow.up") {
+                            if let provider = self.backupServiceManager.services.providers.first {
+                                viewModel.uploadAssets(provider: provider)
+                            }
+                        }
+                    } else {
+                        Menu {
+                            ForEach(self.backupServiceManager.services.activeServices, id: \.self) { service in
+                                Menu {
+                                    switch service {
+                                    case .webDav:
+                                        ForEach(self.backupServiceManager.services.webdav, id: \.credential.identifier) { configClientProvider in
+                                            Button(configClientProvider.credential.identifier) {
+                                                // TODO: Check if client connection is ok here
+                                                if let provider = configClientProvider.provider {
+//                                                    _ = try? configClientProvider.checkClient().then {
+                                                        viewModel.uploadAssets(provider: provider)
+//                                                    }.catch { error in
+//                                                        debugPrint("error")
+//                                                    }
+                                                }
+                                            }
+                                        }
+                                    default:
+                                        EmptyView()
+                                    }
+                                } label: {
+                                    Text(service.name)
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "icloud.and.arrow.up")
+                        }
                     }
+                    
                 }
             }
             .overlay(alignment: .topTrailing, content: {

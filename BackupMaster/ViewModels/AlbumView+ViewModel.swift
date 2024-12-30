@@ -53,14 +53,8 @@ extension AlbumView {
             }
         }
         
-        // TODO: pass provider to this function as argument
-        private func createDir(path: CloudPath) -> Promise<Void> {
+        private func createDir(provider: CloudProvider, path: CloudPath) -> Promise<Void> {
             return Promise { fulfill, reject in
-                guard let provider = self.backupServiceManager.providers.webdav.first else {
-                    reject(NSError(domain: "createDirError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Provider not found"]))
-                    return
-                }
-                
                 provider.createFolderIfMissing(at: path).then {
                     debugPrint("Folder created successfully at \(path.path)")
                     fulfill(()) // Resolve the promise successfully
@@ -72,50 +66,48 @@ extension AlbumView {
         }
 
         
-        func uploadAssets() {
+        func uploadAssets(provider: CloudProvider) {
             debugPrint("Starting upload...")
-            if let provider = self.backupServiceManager.providers.webdav.first {
-                let serialQueue = DispatchQueue(label: "com.example.uploadQueue")
-                let uploadPath = CloudPath("\(self.album.name)")
-                let selectedItems = self.isSelectionActive ? self.assets.filter({ $0.isSelected }) : self.assets
-                createDir(path: uploadPath).then {
-                    var lastPromise = Promise<Void>(())  // Start with a resolved promise
-                    for assetVM in selectedItems {
-                        lastPromise = lastPromise.then {
-                            return Promise { fulfill, reject in
-                                serialQueue.async {
-                                    assetVM.asset.getFileURL { url in
-                                        guard let assetURL = url else {
-                                            // no url
-                                            debugPrint("Failed to get assetURL")
-                                            reject(NSError(domain: "assetGetURL", code: 0, userInfo: [NSLocalizedDescriptionKey: "Can't get the asset URL"]))
-                                            return
-                                        }
-                                        provider.uploadFile(from: assetURL, to: uploadPath.appendingPathComponent(assetURL.lastPathComponent), replaceExisting: true, onTaskCreation: { uploadTask in
-                                            uploadTask?.resume()
-                                            DispatchQueue.main.async {
-                                                guard let uploadTask = uploadTask else { return }
-                                                self.observation = uploadTask.progress.observe(\.fractionCompleted) { progress, _ in
-                                                    debugPrint("Upload progress of \(assetURL.lastPathComponent) is at: \(Int(progress.fractionCompleted * 100))%")
-                                                }
+            let serialQueue = DispatchQueue(label: "com.example.uploadQueue")
+            let uploadPath = CloudPath("\(self.album.name)")
+            let selectedItems = self.isSelectionActive ? self.assets.filter({ $0.isSelected }) : self.assets
+            createDir(provider: provider, path: uploadPath).then {
+                var lastPromise = Promise<Void>(())  // Start with a resolved promise
+                for assetVM in selectedItems {
+                    lastPromise = lastPromise.then {
+                        return Promise { fulfill, reject in
+                            serialQueue.async {
+                                assetVM.asset.getFileURL { url in
+                                    guard let assetURL = url else {
+                                        // no url
+                                        debugPrint("Failed to get assetURL")
+                                        reject(NSError(domain: "assetGetURL", code: 0, userInfo: [NSLocalizedDescriptionKey: "Can't get the asset URL"]))
+                                        return
+                                    }
+                                    provider.uploadFile(from: assetURL, to: uploadPath.appendingPathComponent(assetURL.lastPathComponent), replaceExisting: true, onTaskCreation: { uploadTask in
+                                        uploadTask?.resume()
+                                        DispatchQueue.main.async {
+                                            guard let uploadTask = uploadTask else { return }
+                                            self.observation = uploadTask.progress.observe(\.fractionCompleted) { progress, _ in
+                                                debugPrint("Upload progress of \(assetURL.lastPathComponent) is at: \(Int(progress.fractionCompleted * 100))%")
                                             }
-                                        }).then{ metadata in
-                                            debugPrint("uploading asset: \(metadata.name) complete.")
-                                            fulfill(())
-                                        }.catch{ error in
-                                            debugPrint("Error in upload: \(error)")
-                                            reject(error)
                                         }
+                                    }).then{ metadata in
+                                        debugPrint("uploading asset: \(metadata.name) complete.")
+                                        fulfill(())
+                                    }.catch{ error in
+                                        debugPrint("Error in upload: \(error)")
+                                        reject(error)
                                     }
                                 }
                             }
                         }
                     }
-                    lastPromise.then {
-                        print("All assets uploaded successfully")
-                    }.catch { error in
-                        print("An error occurred: \(error)")
-                    }
+                }
+                lastPromise.then {
+                    print("All assets uploaded successfully")
+                }.catch { error in
+                    print("An error occurred: \(error)")
                 }
             }
         }
