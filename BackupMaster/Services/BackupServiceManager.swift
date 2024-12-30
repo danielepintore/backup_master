@@ -11,14 +11,14 @@ import Combine
 
 class BackupServiceManager: ObservableObject{
     private var webDavCancellable: AnyCancellable?
-    @Published var userServices: [ServiceProvider] = []
     @Published var credentials: ServicesCredentials = .init()
+    @Published var providers: ServiceProviders = .init()
     
     init() {
         // Subscribe to updates from the singleton
         webDavCancellable = WebDavCredentialManager.shared.$clientProviders
             .sink { [weak self] clientProviders in
-                self?.userServices = clientProviders.compactMap({ ServiceProvider(serviceType: .webDav, provider: $0.provider ?? nil) })
+                self?.providers.webdav = clientProviders.compactMap({ $0.provider })
                 self?.credentials.webDav = WebDavCredentialManager.shared.credentials
                 debugPrint("Updated services!")
             }
@@ -31,16 +31,19 @@ class BackupServiceManager: ObservableObject{
             self.webDav = webDavCredentials
         }
     }
-}
-
-extension BackupServiceManager {
-    class ServiceProvider {
-        let serviceType: BackupService
-        var provider: CloudProvider?
-        
-        init(serviceType: BackupService, provider: CloudProvider?) {
-            self.serviceType = serviceType
-            self.provider = provider
+    
+    struct ServiceProviders {
+        var webdav: [CloudProvider]
+        var activeServices: [BackupService] {
+            get {
+                var services: [BackupService] = []
+                if webdav.count > 0 { services.append(.webDav) }
+                // implement for other services
+                return services
+            }
+        }
+        init(webdav: [CloudProvider] = []) {
+            self.webdav = webdav
         }
     }
 }

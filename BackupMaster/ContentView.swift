@@ -47,10 +47,9 @@ struct ContentView: View {
                         }
                     }
                 }
-                let activeServices = Array(Set(backupServiceManager.userServices.compactMap({ $0.serviceType })))
-                if activeServices.count > 0 {
+                if backupServiceManager.providers.activeServices.count > 0 {
                     BMSection("Services") {
-                        ForEach(activeServices, id: \.self){ service in
+                        ForEach(backupServiceManager.providers.activeServices, id: \.self){ service in
                             NavigationLink {
                                 AccountListView(service: service, backupServiceManager: backupServiceManager)
                             } label: {

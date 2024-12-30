@@ -55,9 +55,10 @@ extension AlbumView {
             }
         }
         
+        // TODO: pass provider to this function as argument
         private func createDir(path: CloudPath) -> Promise<Void> {
             return Promise { fulfill, reject in
-                guard let provider = self.backupServiceManager.userServices[0].provider else {
+                guard let provider = self.backupServiceManager.providers.webdav.first else {
                     reject(NSError(domain: "createDirError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Provider not found"]))
                     return
                 }
@@ -75,7 +76,7 @@ extension AlbumView {
         
         func uploadAssets() {
             debugPrint("Starting upload...")
-            if let provider = self.backupServiceManager.userServices[0].provider {
+            if let provider = self.backupServiceManager.providers.webdav.first {
                 let serialQueue = DispatchQueue(label: "com.example.uploadQueue")
                 let uploadPath = CloudPath("\(self.album.name)")
                 let selectedItems = self.isSelectionActive ? self.assets.filter({ $0.isSelected }) : self.assets

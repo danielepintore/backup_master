@@ -9,6 +9,7 @@
 import CryptomatorCloudAccessCore
 import SwiftUI
 import Security
+import Promises
 
 class WebDavCredentialManager: ObservableObject {
     static let shared = {
@@ -26,7 +27,8 @@ class WebDavCredentialManager: ObservableObject {
         self.clientProviders.removeAll(keepingCapacity: true)
         // Create a client for each credential
         for credential in credentials {
-            self.clientProviders.append(.init(client: .init(credential: credential)))
+            let client: WebDAVClient = .init(credential: credential)
+            try? self.clientProviders.append(.init(client: client, provider: .init(with: client)))
         }
         
         // We should implement a struct that holds the client and the provider together
@@ -134,10 +136,23 @@ class WebDavCredentialManager: ObservableObject {
 }
 
 extension WebDavCredentialManager {
-    struct ClientProvider {
+    class ClientProvider {
         var client: WebDAVClient
         var provider: WebDAVProvider?
         // provider is loaded in an async fashion
         var isProviderLoaded: Bool = false
+        
+        init(client: WebDAVClient, provider: WebDAVProvider? = nil) {
+            self.client = client
+            self.provider = provider
+            self.isProviderLoaded = provider != nil ? true : false
+        }
+        
+//        func initializeProvider() throws -> Promise<Void> {
+//            WebDAVAuthenticator.verifyClient(client: self.client).then {
+//                try self.provider = .init(with: self.client)
+//                self.isProviderLoaded = true
+//            }
+//        }
     }
 }
