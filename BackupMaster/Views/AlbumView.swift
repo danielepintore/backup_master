@@ -120,10 +120,11 @@ struct AlbumView: View {
                 }
             }
             .overlay(alignment: .topTrailing, content: {
-                if viewModel.isUploadActive {
-                    UploadProgressView(currentCount: viewModel.currentUploadAsset, maxCount: viewModel.uploadTotalAsset) {
+                if viewModel.isUploadActive || viewModel.uploadErrorMessage != nil {
+                    UploadProgressView(currentCount: viewModel.currentUploadAsset, maxCount: viewModel.uploadTotalAsset, itemProgress: viewModel.uploadAssetProgress, errorMsg: viewModel.uploadErrorMessage) {
                         withAnimation {
                             viewModel.cancelUploads()
+                            viewModel.resetUploadError()
                         }
                     }
                     .animation(.default, value: viewModel.isUploadActive)

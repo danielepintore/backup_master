@@ -34,6 +34,8 @@ extension AlbumView {
         private(set) var isUploadActive: Bool = false
         private(set) var uploadTotalAsset = 0
         private(set) var currentUploadAsset = 0
+        private(set) var uploadErrorMessage: String? = nil
+        private(set) var uploadAssetProgress: Float = 0
 
         init(album: Album) {
             self.album = album
@@ -72,6 +74,7 @@ extension AlbumView {
         
         func uploadAssets(provider: CloudProvider) {
             debugPrint("Starting upload...")
+            self.uploadErrorMessage = nil
             self.isUploadActive = true
             self.currentUploadAsset = 0
             let uploadPath = CloudPath("\(self.album.name)")
@@ -85,14 +88,18 @@ extension AlbumView {
                     lastPromise = lastPromise.then {
                         return Promise { fulfill, reject in
                             if !self.isUploadActive {
-                                reject(NSError(domain: "Upload Canceled", code: 0, userInfo: [NSLocalizedDescriptionKey: "Upload task was canceled"]))
+                                let error = NSError(domain: "Upload Canceled", code: 0, userInfo: [NSLocalizedDescriptionKey: "Upload task was canceled"])
+                                self.showUploadError(error: error)
+                                reject(error)
                                 return
                             }
                             assetVM.asset.getFileURL { url in
                                 guard let assetURL = url else {
                                     // no url
+                                    let error = NSError(domain: "assetGetURL", code: 0, userInfo: [NSLocalizedDescriptionKey: "Can't get the asset URL"])
                                     debugPrint("Failed to get assetURL")
-                                    reject(NSError(domain: "assetGetURL", code: 0, userInfo: [NSLocalizedDescriptionKey: "Can't get the asset URL"]))
+                                    self.showUploadError(error: error)
+                                    reject(error)
                                     return
                                 }
                                 provider.uploadFile(from: assetURL, to: uploadPath.appendingPathComponent(assetURL.lastPathComponent), replaceExisting: true, onTaskCreation: { uploadTask in
@@ -101,6 +108,7 @@ extension AlbumView {
                                         guard let uploadTask = uploadTask else { return }
                                         self.observation = uploadTask.progress.observe(\.fractionCompleted) { progress, _ in
                                             debugPrint("Upload progress of \(assetURL.lastPathComponent) is at: \(Int(progress.fractionCompleted * 100))%")
+                                            self.uploadAssetProgress = Float(progress.fractionCompleted)
                                         }
                                     }
                                 }).then{ metadata in
@@ -109,6 +117,7 @@ extension AlbumView {
                                     fulfill(())
                                 }.catch{ error in
                                     debugPrint("Error in upload: \(error)")
+                                    self.showUploadError(error: error)
                                     reject(error)
                                 }
                             }
@@ -129,6 +138,7 @@ extension AlbumView {
                             self.cancelUploads()
                         }
                     }
+                    self.showUploadError(error: error)
                 }
             }.catch { error in
                 DispatchQueue.main.async {
@@ -136,12 +146,34 @@ extension AlbumView {
                         self.cancelUploads()
                     }
                 }
+                self.showUploadError(error: error)
                 print("An error occurred while creating the directory: \(error)")
             }
         }
         
         func cancelUploads() {
             self.isUploadActive = false
+        }
+        
+        func showUploadError(error: Error) {
+            DispatchQueue.main.async {
+                withAnimation {
+                    self.cancelUploads()
+                    self.isSelectionActive = false
+                    self.cleanAssetSelection()
+                    self.uploadTotalAsset = 0
+                    self.currentUploadAsset = 0
+                    self.uploadErrorMessage = error.localizedDescription
+                }
+            }
+        }
+        
+        func resetUploadError() {
+            DispatchQueue.main.async {
+                withAnimation {
+                    self.uploadErrorMessage = nil
+                }
+            }
         }
     }
         
