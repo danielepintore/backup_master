@@ -9,6 +9,7 @@ import Foundation
 import Photos
 import Promises
 import CryptomatorCloudAccessCore
+import SwiftUI
 
 extension AlbumView {
     struct AssetViewModel {
@@ -30,7 +31,10 @@ extension AlbumView {
             get { assets.count }
         }
         var isSelectionActive: Bool = false
-        
+        private(set) var isUploadActive: Bool = false
+        private(set) var uploadTotalAsset = 0
+        private(set) var currentUploadAsset = 0
+
         init(album: Album) {
             self.album = album
             self.assets = album.assets.map { asset in
@@ -68,37 +72,44 @@ extension AlbumView {
         
         func uploadAssets(provider: CloudProvider) {
             debugPrint("Starting upload...")
-            let serialQueue = DispatchQueue(label: "com.example.uploadQueue")
+            self.isUploadActive = true
+            self.currentUploadAsset = 0
             let uploadPath = CloudPath("\(self.album.name)")
             let selectedItems = self.isSelectionActive ? self.assets.filter({ $0.isSelected }) : self.assets
+            self.isSelectionActive = false
+            self.cleanAssetSelection()
+            self.uploadTotalAsset = selectedItems.count
             createDir(provider: provider, path: uploadPath).then {
                 var lastPromise = Promise<Void>(())  // Start with a resolved promise
-                for assetVM in selectedItems {
+                for (idx, assetVM) in selectedItems.enumerated() {
                     lastPromise = lastPromise.then {
                         return Promise { fulfill, reject in
-                            serialQueue.async {
-                                assetVM.asset.getFileURL { url in
-                                    guard let assetURL = url else {
-                                        // no url
-                                        debugPrint("Failed to get assetURL")
-                                        reject(NSError(domain: "assetGetURL", code: 0, userInfo: [NSLocalizedDescriptionKey: "Can't get the asset URL"]))
-                                        return
-                                    }
-                                    provider.uploadFile(from: assetURL, to: uploadPath.appendingPathComponent(assetURL.lastPathComponent), replaceExisting: true, onTaskCreation: { uploadTask in
-                                        uploadTask?.resume()
-                                        DispatchQueue.main.async {
-                                            guard let uploadTask = uploadTask else { return }
-                                            self.observation = uploadTask.progress.observe(\.fractionCompleted) { progress, _ in
-                                                debugPrint("Upload progress of \(assetURL.lastPathComponent) is at: \(Int(progress.fractionCompleted * 100))%")
-                                            }
+                            if !self.isUploadActive {
+                                reject(NSError(domain: "Upload Canceled", code: 0, userInfo: [NSLocalizedDescriptionKey: "Upload task was canceled"]))
+                                return
+                            }
+                            assetVM.asset.getFileURL { url in
+                                guard let assetURL = url else {
+                                    // no url
+                                    debugPrint("Failed to get assetURL")
+                                    reject(NSError(domain: "assetGetURL", code: 0, userInfo: [NSLocalizedDescriptionKey: "Can't get the asset URL"]))
+                                    return
+                                }
+                                provider.uploadFile(from: assetURL, to: uploadPath.appendingPathComponent(assetURL.lastPathComponent), replaceExisting: true, onTaskCreation: { uploadTask in
+                                    uploadTask?.resume()
+                                    DispatchQueue.main.async {
+                                        guard let uploadTask = uploadTask else { return }
+                                        self.observation = uploadTask.progress.observe(\.fractionCompleted) { progress, _ in
+                                            debugPrint("Upload progress of \(assetURL.lastPathComponent) is at: \(Int(progress.fractionCompleted * 100))%")
                                         }
-                                    }).then{ metadata in
-                                        debugPrint("uploading asset: \(metadata.name) complete.")
-                                        fulfill(())
-                                    }.catch{ error in
-                                        debugPrint("Error in upload: \(error)")
-                                        reject(error)
                                     }
+                                }).then{ metadata in
+                                    debugPrint("uploading asset: \(metadata.name) complete.")
+                                    self.currentUploadAsset = idx + 1
+                                    fulfill(())
+                                }.catch{ error in
+                                    debugPrint("Error in upload: \(error)")
+                                    reject(error)
                                 }
                             }
                         }
@@ -106,10 +117,31 @@ extension AlbumView {
                 }
                 lastPromise.then {
                     print("All assets uploaded successfully")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        withAnimation {
+                            self.cancelUploads()
+                        }
+                    }
                 }.catch { error in
                     print("An error occurred: \(error)")
+                    DispatchQueue.main.async {
+                        withAnimation {
+                            self.cancelUploads()
+                        }
+                    }
                 }
+            }.catch { error in
+                DispatchQueue.main.async {
+                    withAnimation {
+                        self.cancelUploads()
+                    }
+                }
+                print("An error occurred while creating the directory: \(error)")
             }
+        }
+        
+        func cancelUploads() {
+            self.isUploadActive = false
         }
     }
         

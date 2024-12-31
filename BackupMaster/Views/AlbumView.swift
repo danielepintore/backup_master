@@ -84,7 +84,9 @@ struct AlbumView: View {
                     } else if self.backupServiceManager.services.providers.count == 1 {
                         Button("", systemImage: "icloud.and.arrow.up") {
                             if let provider = self.backupServiceManager.services.providers.first {
-                                viewModel.uploadAssets(provider: provider)
+                                withAnimation {
+                                    viewModel.uploadAssets(provider: provider)
+                                }
                             }
                         }
                     } else {
@@ -97,11 +99,9 @@ struct AlbumView: View {
                                             Button(configClientProvider.credential.identifier) {
                                                 // TODO: Check if client connection is ok here
                                                 if let provider = configClientProvider.provider {
-//                                                    _ = try? configClientProvider.checkClient().then {
+                                                    withAnimation {
                                                         viewModel.uploadAssets(provider: provider)
-//                                                    }.catch { error in
-//                                                        debugPrint("error")
-//                                                    }
+                                                    }
                                                 }
                                             }
                                         }
@@ -120,23 +120,32 @@ struct AlbumView: View {
                 }
             }
             .overlay(alignment: .topTrailing, content: {
-                Button {
-                    viewModel.isSelectionActive.toggle()
-                    // Clean selection
-                    if !viewModel.isSelectionActive {
-                        viewModel.cleanAssetSelection()
+                if viewModel.isUploadActive {
+                    UploadProgressView(currentCount: viewModel.currentUploadAsset, maxCount: viewModel.uploadTotalAsset) {
+                        withAnimation {
+                            viewModel.cancelUploads()
+                        }
                     }
-                } label: {
-                    Text(viewModel.isSelectionActive ? "Done": "Select")
-                        .font(.footnote)
-                        .fontWeight(.semibold)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .foregroundStyle(Color.primary)
-                        .background(.regularMaterial, in: Capsule())
+                    .animation(.default, value: viewModel.isUploadActive)
+                } else  {
+                    Button {
+                        viewModel.isSelectionActive.toggle()
+                        // Clean selection
+                        if !viewModel.isSelectionActive {
+                            viewModel.cleanAssetSelection()
+                        }
+                    } label: {
+                        Text(viewModel.isSelectionActive ? "Done": "Select")
+                            .font(.footnote)
+                            .fontWeight(.semibold)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .foregroundStyle(Color.primary)
+                            .background(.regularMaterial, in: Capsule())
+                    }
+                    .padding()
+                    .animation(.default, value: viewModel.isSelectionActive)
                 }
-                .padding()
-                .animation(.default, value: viewModel.isSelectionActive)
             })
             .onChange(of: viewModel.isSelectionActive, { oldValue, newValue in
                 panGesture?.isEnabled = newValue
@@ -161,6 +170,7 @@ struct AlbumView: View {
             }
             .onDisappear {
                 UIApplication.shared.isIdleTimerDisabled = false
+                viewModel.cancelUploads()
             }
             //            .sheet(isPresented: $isSheetPresented, content: {
             //                UploadSheet()
@@ -225,6 +235,72 @@ struct AlbumView: View {
         var isDeleteDrag: Bool = false
     }
 }
+//
+//struct ProgressPopup: View {
+//    @Binding var showPopup: Bool
+//
+//    var body: some View {
+//        Color.black.opacity(0.4)
+//            .ignoresSafeArea(edges: .all)
+//        VStack {
+//            Text("This is a popup")
+//                .font(.title)
+//                .padding()
+//                .cornerRadius(12)
+//            
+//            Button(action: {
+//                withAnimation {
+//                    showPopup.toggle()
+//                }
+//            }) {
+//                Text("Close")
+//                    .padding()
+//                    .background(Color.red)
+//                    .foregroundColor(.white)
+//                    .cornerRadius(8)
+//            }
+//        }
+//        .frame(maxWidth: 300)
+//        .padding()
+//        .background(Color(uiColor: .systemBackground))
+//        .cornerRadius(12)
+//        .shadow(radius: 20)
+//        .transition(.opacity)
+//        .disableSwipeBackGesture(showPopup)
+//    }
+//}
+//
+//extension View {
+//    /// A view modifier to disable the swipe-to-go-back gesture in a `NavigationView`.
+//    func disableSwipeBackGesture(_ condition: Bool) -> some View {
+//        self.background(SwipeBackDisabler(isDisabled: condition))
+//    }
+//}
+//
+//struct SwipeBackDisabler: UIViewControllerRepresentable {
+//    var isDisabled: Bool
+//
+//    func makeUIViewController(context: Context) -> UIViewController {
+//        let viewController = UIViewController()
+//        viewController.view.backgroundColor = .clear
+//        return viewController
+//    }
+//
+//    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+//        DispatchQueue.main.async {
+//            if let navigationController = uiViewController.navigationController {
+//                // Disable/Enable swipe gesture
+//                navigationController.interactivePopGestureRecognizer?.isEnabled = !isDisabled
+//                
+//                // Hide/Show back button
+//                if let topViewController = navigationController.topViewController {
+//                    topViewController.navigationItem.hidesBackButton = isDisabled
+//                }
+//            }
+//        }
+//    }
+//}
+
 //struct UploadSheet: View {
 //    var photoCount = 23
 //    var services = ["WebDAV", "FTP", "SMB", "BackBlaze"]
