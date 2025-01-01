@@ -40,24 +40,24 @@ struct UpdateServiceAccountView: View {
             }
             
             switch service {
-            case .box:
-                Text("Not Implemented")
-            case .dropbox:
-                Text("Not Implemented")
-            case .googleDrive:
-                Text("Not Implemented")
-            case .oneDrive:
-                Text("Not Implemented")
-            case .pCloud:
-                Text("Not Implemented")
-            case .s3:
-                Text("Not Implemented")
-            case .backblaze:
-                Text("Not Implemented")
+//            case .box:
+//                Text("Not Implemented")
+//            case .dropbox:
+//                Text("Not Implemented")
+//            case .googleDrive:
+//                Text("Not Implemented")
+//            case .oneDrive:
+//                Text("Not Implemented")
+//            case .pCloud:
+//                Text("Not Implemented")
+//            case .s3:
+//                Text("Not Implemented")
+//            case .backblaze:
+//                Text("Not Implemented")
             case .webDav:
                 UpdateWebDavServiceView(identifier: self.credentialIdentifier, backupServiceManager: self.backupServiceManager) // if identifier is se we are updating an account
-            case .lfs:
-                Text("Not Implemented")
+//            case .lfs:
+//                Text("Not Implemented")
             case nil:
                 EmptyView()
             }

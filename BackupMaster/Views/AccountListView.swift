@@ -28,20 +28,20 @@ struct AccountListView: View {
             }
             Section {
                 switch service {
-                case .box:
-                    Text("Need Implementation")
-                case .dropbox:
-                    Text("Need Implementation")
-                case .googleDrive:
-                    Text("Need Implementation")
-                case .oneDrive:
-                    Text("Need Implementation")
-                case .pCloud:
-                    Text("Need Implementation")
-                case .s3:
-                    Text("Need Implementation")
-                case .backblaze:
-                    Text("Need Implementation")
+//                case .box:
+//                    Text("Need Implementation")
+//                case .dropbox:
+//                    Text("Need Implementation")
+//                case .googleDrive:
+//                    Text("Need Implementation")
+//                case .oneDrive:
+//                    Text("Need Implementation")
+//                case .pCloud:
+//                    Text("Need Implementation")
+//                case .s3:
+//                    Text("Need Implementation")
+//                case .backblaze:
+//                    Text("Need Implementation")
                 case .webDav:
                     ForEach(backupServiceManager.services.webdav, id: \.credential.identifier) { webDavConfig in
                         let credential = webDavConfig.credential
@@ -55,8 +55,8 @@ struct AccountListView: View {
                             }
                         }
                     }
-                case .lfs:
-                    Text("Need Implementation")
+//                case .lfs:
+//                    Text("Need Implementation")
                 }
             }
         }

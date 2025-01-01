@@ -58,11 +58,11 @@ struct ContentView: View {
                         }
                     }
                 }
-                BMSection("Other") {
-                    NavigationLink(destination: SettingsView()) {
-                        Label("Settings", systemImage: "gear")
-                    }
-                }
+//                BMSection("Other") {
+//                    NavigationLink(destination: SettingsView()) {
+//                        Label("Settings", systemImage: "gear")
+//                    }
+//                }
             }
             .listSectionSpacing(.compact)
             .navigationTitle("Backup Master")

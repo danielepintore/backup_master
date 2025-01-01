@@ -49,36 +49,36 @@ class BackupServiceManager: ObservableObject{
 }
 
 enum BackupService: CaseIterable {
-    case box
-    case dropbox
-    case googleDrive
-    case oneDrive
-    case pCloud
-    case s3
-    case backblaze
+//    case box
+//    case dropbox
+//    case googleDrive
+//    case oneDrive
+//    case pCloud
+//    case s3
+//    case backblaze
     case webDav
-    case lfs // local file system
+//    case lfs // local file system
     
     var name: String {
         switch self {
-        case .box:
-            "Box"
-        case .dropbox:
-            "DropBox"
-        case .googleDrive:
-            "Google Drive"
-        case .oneDrive:
-            "One Drive"
-        case .pCloud:
-            "pCloud"
-        case .s3:
-            "Amazon S3"
-        case .backblaze:
-            "BackBlaze B2"
+//        case .box:
+//            "Box"
+//        case .dropbox:
+//            "DropBox"
+//        case .googleDrive:
+//            "Google Drive"
+//        case .oneDrive:
+//            "One Drive"
+//        case .pCloud:
+//            "pCloud"
+//        case .s3:
+//            "Amazon S3"
+//        case .backblaze:
+//            "BackBlaze B2"
         case .webDav:
             "WebDav"
-        case .lfs:
-            "Local File System"
+//        case .lfs:
+//            "Local File System"
         }
     }
     
