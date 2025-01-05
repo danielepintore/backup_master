@@ -9,8 +9,6 @@ BackupMaster Home screen" /> &nbsp;
 BackupMaster album screen" />
 <img src="Screenshots/accounts_screen.jpg" width="250" alt="Screenshot of
 BackupMaster account list screen" /> &nbsp;
-<img src="Screenshots/info_screen.jpg" width="250" alt="Screenshot of
-BackupMaster edit accoutn info screen" /> &nbsp;
 
 ---
 
